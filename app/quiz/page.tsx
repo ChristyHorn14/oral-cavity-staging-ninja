@@ -7,6 +7,8 @@ import { alveolarRidgeCases } from "@/data/alveolarRidgeCases";
 import { buccalMucosaCases } from "@/data/buccalMucosaCases";
 import { hardPalateCases } from "@/data/hardPalateCases";
 import { retromolarTrigoneCases } from "@/data/retromolarTrigoneCases";
+import Image from "next/image";
+
 
 import { computeT, computeN, computeStageGroup } from "@/lib/staging/staging";
 import {
@@ -270,42 +272,83 @@ export default function QuizPage() {
         color: "#e5e7eb",
       }}
     >
-      <h1 style={{ marginBottom: 6 }}>Oral Cavity Staging Ninja (MVP)</h1>
+{/* CrabsMcChaffey header */}
+<div
+  style={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    textAlign: "center",
+    gap: 8,
+    marginBottom: 16,
+  }}
+>
+  <Image
+    src="/crabs.png"
+    alt="CrabsMcChaffey crab logo"
+    width={120}
+    height={60}
+    style={{
+      borderRadius: 12,
+      objectFit: "cover",
+    }}
+  />
 
-      {/* Pool toggle: Oral cavity vs Mixed */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 6,
-          marginBottom: 12,
-        }}
-      >
-        {(
-          [
-            ["oral_cavity", "Oral cavity"],
-            ["mixed", "Mixed"],
-          ] as [CasePool, string][]
-        ).map(([value, label]) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => handlePoolChange(value)}
-            style={{
-              padding: "6px 12px",
-              borderRadius: 999,
-              border: "1px solid #4b5563",
-              backgroundColor: pool === value ? "#1f2937" : "transparent",
-              color: "#e5e7eb",
-              cursor: "pointer",
-              fontSize: 13,
-              whiteSpace: "nowrap",
-            }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+  <h1
+    style={{
+      margin: 0,
+      fontSize: 24,
+    }}
+  >
+    🦀🦀 CrabsMcChaffey Staging Ninja 🦀🦀
+  </h1>
+
+  <p
+    style={{
+      margin: 0,
+      fontSize: 14,
+      color: "#9ca3af",
+    }}
+  >
+    Interactive TNM drills for HN Cancer Staging
+  </p>
+</div>
+
+{/* Pool toggle: Oral cavity vs Mixed */}
+<div
+  style={{
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 6,
+    marginBottom: 12,
+  }}
+>
+  {(
+    [
+      ["oral_cavity", "Oral cavity"],
+      ["mixed", "Mixed"],
+    ] as [CasePool, string][]
+  ).map(([value, label]) => (
+    <button
+      key={value}
+      type="button"
+      onClick={() => handlePoolChange(value)}
+      style={{
+        padding: "6px 12px",
+        borderRadius: 999,
+        border: "1px solid #4b5563",
+        backgroundColor: pool === value ? "#1f2937" : "transparent",
+        color: "#e5e7eb",
+        cursor: "pointer",
+        fontSize: 13,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {label}
+    </button>
+  ))}
+</div>
+
 
       <div
         style={{
