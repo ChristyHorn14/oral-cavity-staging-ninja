@@ -18,7 +18,15 @@ export type Sex = "M" | "F";
 export type Laterality = "left" | "right" | "midline";
 export type NodeLaterality = "none" | "ipsilateral" | "contralateral" | "bilateral";
 
-export type OralCavitySubsite = "oral_tongue" | "floor_of_mouth";
+export type OralCavitySubsite =
+  | "oral_tongue"
+  | "floor_of_mouth"
+  | "alveolar_ridge"
+  | "buccal_mucosa"
+  | "hard_palate"
+  | "retromolar_trigone";
+
+
 
 export interface TumorFeatures {
   size_cm: number;

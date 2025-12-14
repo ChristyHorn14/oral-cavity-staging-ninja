@@ -3,6 +3,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { oralTongueCases } from "@/data/oralTongueCases";
 import { floorOfMouthCases } from "@/data/floorOfMouthCases";
+import { alveolarRidgeCases } from "@/data/alveolarRidgeCases";
+import { buccalMucosaCases } from "@/data/buccalMucosaCases";
+import { hardPalateCases } from "@/data/hardPalateCases";
+import { retromolarTrigoneCases } from "@/data/retromolarTrigoneCases";
+
 import { computeT, computeN, computeStageGroup } from "@/lib/staging/staging";
 import {
   OralCavityCase,
@@ -15,11 +20,55 @@ function randIndex(n: number) {
   return Math.floor(Math.random() * n);
 }
 
-// Pools of cases to draw from
-type CasePool = "oral_tongue" | "floor_of_mouth" | "mixed";
+// For now everything is oral cavity; later you can add non–oral-cavity case arrays
+// and widen the types.
+type CasePool = "oral_cavity" | "mixed";
+
+// All oral cavity cases (all subsites)
+const oralCavityCases: OralCavityCase[] = [
+  ...oralTongueCases,
+  ...floorOfMouthCases,
+  ...alveolarRidgeCases,
+  ...buccalMucosaCases,
+  ...hardPalateCases,
+  ...retromolarTrigoneCases,
+];
+
+// Placeholder for future global pool (e.g., oral cavity + larynx + OP)
+const allCases: OralCavityCase[] = oralCavityCases;
+
+function getCasesForPool(pool: CasePool): OralCavityCase[] {
+  switch (pool) {
+    case "oral_cavity":
+      return oralCavityCases;
+    case "mixed":
+    default:
+      // later: return all head & neck subsites here
+      return allCases;
+  }
+}
+
+function prettySubsiteLabel(subsite: OralCavityCase["subsite"]): string {
+  switch (subsite) {
+    case "oral_tongue":
+      return "oral tongue";
+    case "floor_of_mouth":
+      return "floor of mouth";
+    case "alveolar_ridge":
+      return "alveolar ridge / gingiva";
+    case "buccal_mucosa":
+      return "buccal mucosa";
+    case "hard_palate":
+      return "hard palate";
+    case "retromolar_trigone":
+      return "retromolar trigone";
+    default:
+      return "oral cavity";
+  }
+}
 
 function prettySite(c: OralCavityCase) {
-  const base = c.subsite === "oral_tongue" ? "oral tongue" : "floor of mouth";
+  const base = prettySubsiteLabel(c.subsite);
   const lat = c.stem?.laterality;
   if (lat && lat !== "midline") return `${lat} ${base}`;
   if (lat === "midline") return `midline ${base}`;
@@ -82,12 +131,10 @@ function ChoiceGrid<T extends string>(props: {
           const isSelected = value === x;
           const isCorrect = x === correctValue;
 
-          // Default (not submitted)
           let border = isSelected ? "2px solid #f9fafb" : "1px solid #4b5563";
           let background = isSelected ? "#1f2937" : "#111827";
           let opacity = 1;
 
-          // After submit: show correct (green) and selected wrong (red)
           if (submitted) {
             opacity = isCorrect || isSelected ? 1 : 0.6;
 
@@ -136,7 +183,6 @@ export default function QuizPage() {
 
   useEffect(() => {
     const check = () => {
-      // guard for SSR
       if (typeof window !== "undefined") {
         setIsMobile(window.innerWidth < 768);
       }
@@ -147,22 +193,17 @@ export default function QuizPage() {
   }, []);
 
   // ----- case pools -----
-  const [pool, setPool] = useState<CasePool>("oral_tongue");
+  const [pool, setPool] = useState<CasePool>("oral_cavity");
 
-  const allCases: OralCavityCase[] = useMemo(
-    () => [...oralTongueCases, ...floorOfMouthCases],
-    []
-  );
+  const cases = useMemo(() => {
+    const list = getCasesForPool(pool);
+    if (!list || list.length === 0) return allCases;
+    return list;
+  }, [pool]);
 
-  const cases: OralCavityCase[] =
-    pool === "oral_tongue"
-      ? oralTongueCases
-      : pool === "floor_of_mouth"
-      ? floorOfMouthCases
-      : allCases;
-
-  const [caseIdx, setCaseIdx] = useState(() => randIndex(cases.length));
-  const c = cases[caseIdx];
+  const safeCases = cases.length > 0 ? cases : allCases;
+  const [caseIdx, setCaseIdx] = useState(() => randIndex(safeCases.length));
+  const c = safeCases[caseIdx];
 
   const correct = useMemo(() => {
     const T = computeT(c.tumor);
@@ -185,7 +226,8 @@ export default function QuizPage() {
 
   const resetForNext = () => {
     resetAnswers();
-    setCaseIdx(randIndex(cases.length));
+    const list = getCasesForPool(pool) || allCases;
+    setCaseIdx(randIndex(list.length));
   };
 
   const handlePoolChange = (next: CasePool) => {
@@ -193,14 +235,9 @@ export default function QuizPage() {
     setPool(next);
     resetAnswers();
 
-    const nextCases: OralCavityCase[] =
-      next === "oral_tongue"
-        ? oralTongueCases
-        : next === "floor_of_mouth"
-        ? floorOfMouthCases
-        : allCases;
-
-    setCaseIdx(randIndex(nextCases.length));
+    const nextCases = getCasesForPool(next);
+    const list = nextCases && nextCases.length > 0 ? nextCases : allCases;
+    setCaseIdx(randIndex(list.length));
   };
 
   const canSubmit = Boolean(userT && userN && userStage);
@@ -229,67 +266,45 @@ export default function QuizPage() {
         padding: 16,
         fontFamily: "system-ui, sans-serif",
         minHeight: "100vh",
-        backgroundColor: "#020617", // dark background
-        color: "#e5e7eb", // light text
+        backgroundColor: "#020617",
+        color: "#e5e7eb",
       }}
     >
       <h1 style={{ marginBottom: 6 }}>Oral Cavity Staging Ninja (MVP)</h1>
 
-      {/* Pool toggle: oral tongue / FOM / mixed */}
+      {/* Pool toggle: Oral cavity vs Mixed */}
       <div
         style={{
-          display: "inline-flex",
-          borderRadius: 999,
-          border: "1px solid #4b5563",
-          overflow: "hidden",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 6,
           marginBottom: 12,
-          backgroundColor: "#020617",
         }}
       >
-        <button
-          type="button"
-          onClick={() => handlePoolChange("oral_tongue")}
-          style={{
-            padding: "6px 14px",
-            border: "none",
-            backgroundColor:
-              pool === "oral_tongue" ? "#1f2937" : "transparent",
-            color: "#e5e7eb",
-            cursor: "pointer",
-            fontSize: 14,
-          }}
-        >
-          Oral tongue
-        </button>
-        <button
-          type="button"
-          onClick={() => handlePoolChange("floor_of_mouth")}
-          style={{
-            padding: "6px 14px",
-            border: "none",
-            backgroundColor:
-              pool === "floor_of_mouth" ? "#1f2937" : "transparent",
-            color: "#e5e7eb",
-            cursor: "pointer",
-            fontSize: 14,
-          }}
-        >
-          Floor of mouth
-        </button>
-        <button
-          type="button"
-          onClick={() => handlePoolChange("mixed")}
-          style={{
-            padding: "6px 14px",
-            border: "none",
-            backgroundColor: pool === "mixed" ? "#1f2937" : "transparent",
-            color: "#e5e7eb",
-            cursor: "pointer",
-            fontSize: 14,
-          }}
-        >
-          Mixed
-        </button>
+        {(
+          [
+            ["oral_cavity", "Oral cavity"],
+            ["mixed", "Mixed"],
+          ] as [CasePool, string][]
+        ).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => handlePoolChange(value)}
+            style={{
+              padding: "6px 12px",
+              borderRadius: 999,
+              border: "1px solid #4b5563",
+              backgroundColor: pool === value ? "#1f2937" : "transparent",
+              color: "#e5e7eb",
+              cursor: "pointer",
+              fontSize: 13,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       <div
