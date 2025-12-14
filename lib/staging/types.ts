@@ -35,6 +35,11 @@ export interface NodeFeatures {
   ene: boolean;
 }
 
+// Backwards-compatible aliases for existing staging.ts imports
+export type TumorInputs = TumorFeatures;
+export type NodeInputs = NodeFeatures;
+
+
 export interface OralCavityCase {
   id: string;
   subsite: OralCavitySubsite;
