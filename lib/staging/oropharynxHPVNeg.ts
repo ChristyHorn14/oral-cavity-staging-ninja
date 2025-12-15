@@ -1,69 +1,79 @@
 // lib/staging/oropharynxHPVNeg.ts
+// AJCC 8th Edition – HPV-Negative Oropharynx
 
-export type OropharynxNegT = "T0" | "T1" | "T2" | "T3" | "T4";
+export type OropharynxNegT = "T0" | "T1" | "T2" | "T3" | "T4a" | "T4b";
 export type OropharynxNegN = "N0" | "N1" | "N2a" | "N2b" | "N2c" | "N3a" | "N3b";
-export type OropharynxNegStage = "I" | "II" | "III" | "IVA" | "IVB"; // assume M0 for MVP
+export type OropharynxNegStage = "I" | "II" | "III" | "IVA" | "IVB";
 
-export interface OropharynxNegTumorInputs {
+// -----------------------------
+// Tumor (T) computation
+// -----------------------------
+
+export interface OropharynxHPVNegTumor {
   size_cm: number;
-  advanced_local_extension: boolean; // your existing “T4 proxy”
-  primary_unknown?: boolean;         // allows T0
+  advanced_local_extension?: boolean; // T4a-level invasion (resectable)
+  very_advanced_local_extension?: boolean; // T4b-level invasion (unresectable)
 }
 
-export interface OropharynxNegNodes {
-  positive_node_count: number; // needed for N2b vs N1/N2a
-  laterality: "none" | "ipsilateral" | "contralateral" | "bilateral" | "unknown";
-  largest_node_cm: number;
-  ene: boolean;
-}
-
-// T (simple MVP consistent with your HPV+ pattern)
-export function computeT_OropharynxHPVNeg(t: OropharynxNegTumorInputs): OropharynxNegT {
-  if (t.primary_unknown) return "T0";
+export function computeT_OropharynxHPVNeg(t: OropharynxHPVNegTumor): OropharynxNegT {
   const size = t.size_cm ?? 0;
+
+  // T0: no primary tumor
   if (Math.abs(size) < 1e-6) return "T0";
-  if (t.advanced_local_extension) return "T4";
+
+  // T4b: very advanced / unresectable
+  if (t.very_advanced_local_extension) return "T4b";
+
+  // T4a: advanced local extension (resectable)
+  if (t.advanced_local_extension) return "T4a";
+
+  // Size-based staging
   if (size > 4) return "T3";
   if (size > 2) return "T2";
   return "T1";
 }
 
-// N (AJCC-style conventional nodes; MVP)
-export function computeN_OropharynxHPVNeg(n: OropharynxNegNodes): OropharynxNegN {
-  const k = n.positive_node_count ?? 0;
-  const lat = n.laterality ?? "unknown";
-  const d = n.largest_node_cm ?? 0;
-  const ene = Boolean(n.ene);
+// -----------------------------
+// Nodal (N) computation
+// -----------------------------
 
-  if (k === 0 || lat === "none") return "N0";
+export interface OropharynxHPVNegNodes {
+  positive_node_count: number;
+  laterality?: "ipsilateral" | "contralateral" | "bilateral" | "none" | "unknown";
+  largest_node_cm: number;
+  ene: boolean;
+}
 
-  // N3b: any ENE+ nodal disease (MVP)
-  if (ene) return "N3b";
+export function computeN_OropharynxHPVNeg(n: OropharynxHPVNegNodes): OropharynxNegN {
+  if (n.positive_node_count === 0) return "N0";
 
-  // N3a: > 6 cm, ENE-
-  if (d > 6) return "N3a";
+  // ENE+ is always N3b
+  if (n.ene) return "N3b";
 
-  // N2c: bilateral or contralateral nodes, none > 6 cm, ENE-
-  if (lat === "bilateral" || lat === "contralateral") return "N2c";
+  // Size-based N3a
+  if (n.largest_node_cm > 6) return "N3a";
 
-  // ipsilateral only, ENE-, <= 6 cm
-  // N1: single ipsi <= 3 cm
-  if (lat === "ipsilateral" && k === 1 && d <= 3) return "N1";
+  // Single node logic
+  if (n.positive_node_count === 1) {
+    if (n.largest_node_cm <= 3) return "N1";
+    return "N2a";
+  }
 
-  // N2a: single ipsi >3 to 6 cm
-  if (lat === "ipsilateral" && k === 1 && d > 3 && d <= 6) return "N2a";
-
-  // N2b: multiple ipsi, none > 6 cm
-  if (lat === "ipsilateral" && k > 1) return "N2b";
-
-  // fallback (unknown laterality etc.)
+  // Multiple nodes
+  if (n.laterality === "bilateral" || n.laterality === "contralateral") return "N2c";
   return "N2b";
 }
 
-// Stage grouping (M0 assumed, simplified but consistent)
-export function computeStageGroup_OropharynxHPVNeg(T: OropharynxNegT, N: OropharynxNegN): OropharynxNegStage {
-  // IVB: any N3 or T4 (in MVP we lump T4 here; you can split T4a/T4b later)
-  if (N === "N3a" || N === "N3b" || T === "T4") return "IVB";
+// -----------------------------
+// Stage grouping (AJCC 8)
+// -----------------------------
+
+export function computeStageGroup_OropharynxHPVNeg(
+  T: OropharynxNegT,
+  N: OropharynxNegN
+): OropharynxNegStage {
+  // IVB: T4b any N OR any N3
+  if (T === "T4b" || N === "N3a" || N === "N3b") return "IVB";
 
   // I: T1 N0
   if (T === "T1" && N === "N0") return "I";
@@ -71,9 +81,27 @@ export function computeStageGroup_OropharynxHPVNeg(T: OropharynxNegT, N: Orophar
   // II: T2 N0
   if (T === "T2" && N === "N0") return "II";
 
-  // III: T3 N0 OR T1–T3 with N1
-  if ((T === "T3" && N === "N0") || (N === "N1" && (T === "T1" || T === "T2" || T === "T3"))) return "III";
+  // III: T3 N0 OR T1–T3 N1
+  if (
+    (T === "T3" && N === "N0") ||
+    (N === "N1" && (T === "T1" || T === "T2" || T === "T3"))
+  ) return "III";
 
-  // IVA: everything else that isn't IVB (mostly N2 disease with T1–T3)
+  // IVA: T4a N0–N2 OR T1–T3 N2
   return "IVA";
+}
+
+// -----------------------------
+// Dev-only invariants
+// -----------------------------
+
+if (process.env.NODE_ENV !== "production") {
+  const Ns: OropharynxNegN[] = ["N0", "N1", "N2a", "N2b", "N2c", "N3a", "N3b"];
+
+  for (const N of Ns) {
+    const stage = computeStageGroup_OropharynxHPVNeg("T4b", N);
+    if (stage !== "IVB") {
+      throw new Error(`Invariant failed: T4b ${N} staged as ${stage}`);
+    }
+  }
 }

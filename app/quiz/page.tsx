@@ -93,8 +93,6 @@ function prettySubsiteLabel(subsite: OralCavityCase["subsite"]): string {
 }
 
 function isOralCavityCase(c: AnyCase): c is OralCavityCase {
-  // Oral cavity cases have these guaranteed fields in your type:
-  // - site_group === "oral_cavity" OR tumor has doi_mm etc.
   return (c as any)?.site_group === "oral_cavity" || (c as any)?.tumor?.doi_mm !== undefined;
 }
 
@@ -357,7 +355,9 @@ export default function QuizPage() {
   const isOP = isOPPos || isOPNeg;
 
   // Choice sets depend on site (and HPV status for OP)
-  const tChoices = (isOP ? (["T0", "T1", "T2", "T3", "T4"] as const) : (["T1", "T2", "T3", "T4a"] as const)) as readonly string[];
+  const tChoices = (isOP
+    ? (["T0", "T1", "T2", "T3", "T4a", "T4b"] as const)
+    : (["T1", "T2", "T3", "T4a", "T4b"] as const)) as readonly string[];
 
   const nChoices = (isOPPos
     ? (["N0", "N1", "N2"] as const)
@@ -379,16 +379,23 @@ export default function QuizPage() {
   const Findings = () => {
     if (isOropharynxCase(c)) {
       const hpvLabel = isOropharynxHPVNegCase(c) ? "negative" : "positive";
+      const tumor = (c as any).tumor ?? {};
+      const nodes = (c as any).nodes ?? {};
+
+      // NEW: show T4a vs T4b schema fields (safe even if missing)
+      const adv = Boolean(tumor.advanced_local_extension);
+      const veryAdv = Boolean(tumor.very_advanced_local_extension);
 
       return (
         <ul style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7, fontSize: 18 }}>
-          <li>Tumor size: {(c as any).tumor.size_cm} cm</li>
-          <li>Advanced local extension: {(c as any).tumor.advanced_local_extension ? "yes" : "no"}</li>
+          <li>Tumor size: {tumor.size_cm} cm</li>
+          <li>Invades the larynx, extrinsic muscle of tongue, medial pterygoid, hard palate, or mandible?: {adv ? "yes" : "no"}</li>
+          <li>Invades lateral pterygoid muscle, pterygoid plates, lateral nasopharynx, skull base, or encases carotid artery?: {veryAdv ? "yes" : "no"}</li>
           <li>
-            Nodes: positive nodes {(c as any).nodes.positive_node_count}
-            {(c as any).nodes.laterality ? `, laterality ${(c as any).nodes.laterality}` : ""}
-            {typeof (c as any).nodes.largest_node_cm === "number" ? `, largest ${(c as any).nodes.largest_node_cm} cm` : ""}
-            {typeof (c as any).nodes.ene === "boolean" ? `, ENE ${(c as any).nodes.ene ? "yes" : "no"}` : ""}
+            Nodes: positive nodes {nodes.positive_node_count}
+            {nodes.laterality ? `, laterality ${nodes.laterality}` : ""}
+            {typeof nodes.largest_node_cm === "number" ? `, largest ${nodes.largest_node_cm} cm` : ""}
+            {typeof nodes.ene === "boolean" ? `, ENE ${nodes.ene ? "yes" : "no"}` : ""}
           </li>
           <li>HPV status: {hpvLabel}</li>
         </ul>
@@ -488,31 +495,31 @@ export default function QuizPage() {
       >
         <ChoiceGrid
           title="Pick T"
-          choices={tChoices}
+          choices={tChoices as any}
           value={userT as any}
           onChange={(v) => setUserT(v)}
           submitted={submitted}
-          correctValue={correct.T}
+          correctValue={correct.T as any}
           isMobile={isMobile}
         />
 
         <ChoiceGrid
           title="Pick N"
-          choices={nChoices}
+          choices={nChoices as any}
           value={userN as any}
           onChange={(v) => setUserN(v)}
           submitted={submitted}
-          correctValue={correct.N}
+          correctValue={correct.N as any}
           isMobile={isMobile}
         />
 
         <ChoiceGrid
           title="Pick Stage Group"
-          choices={stageChoices}
+          choices={stageChoices as any}
           value={userStage as any}
           onChange={(v) => setUserStage(v)}
           submitted={submitted}
-          correctValue={correct.stage}
+          correctValue={correct.stage as any}
           isMobile={isMobile}
         />
       </div>
