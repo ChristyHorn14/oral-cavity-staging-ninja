@@ -25,6 +25,7 @@ export interface OropharynxPathNodes {
 
 export function computeT_OropharynxHPVPos_Path(t: OropharynxTumorInputs): OropharynxT {
   if (t.primary_unknown) return "T0";
+  if (t.size_cm == 0) return "T0";
   if (t.advanced_local_extension) return "T4";
   if (t.size_cm > 4) return "T3";
   if (t.size_cm > 2) return "T2";

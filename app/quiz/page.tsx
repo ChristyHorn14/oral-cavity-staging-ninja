@@ -380,6 +380,7 @@ export default function QuizPage() {
             {typeof c.nodes.largest_node_cm === "number" ? `, largest ${c.nodes.largest_node_cm} cm` : ""}
             {typeof c.nodes.ene === "boolean" ? `, ENE ${c.nodes.ene ? "yes" : "no"}` : ""}
           </li>
+          <li>HPV status: positive</li>
         </ul>
       );
     }
