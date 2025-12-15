@@ -355,8 +355,10 @@ export default function QuizPage() {
   const isOP = isOPPos || isOPNeg;
 
   // Choice sets depend on site (and HPV status for OP)
-  const tChoices = (isOP
-    ? (["T0", "T1", "T2", "T3", "T4a", "T4b"] as const)
+  const tChoices = (isOPPos
+    ? (["T0", "T1", "T2", "T3", "T4"] as const)
+    : isOPNeg
+    ? (["T1", "T2", "T3", "T4a", "T4b"] as const)
     : (["T1", "T2", "T3", "T4a", "T4b"] as const)) as readonly string[];
 
   const nChoices = (isOPPos
