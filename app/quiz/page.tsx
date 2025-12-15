@@ -16,8 +16,15 @@ import {
   computeStageGroup_OropharynxHPVPos_Path,
 } from "@/lib/staging/oropharynxHPVPosPath";
 
+import { oropharynxHPVNegCases } from "@/data/oropharynxHPVNegCases";
+import {
+  computeT_OropharynxHPVNeg,
+  computeN_OropharynxHPVNeg,
+  computeStageGroup_OropharynxHPVNeg,
+} from "@/lib/staging/oropharynxHPVNeg";
+
 import { computeT, computeN, computeStageGroup } from "@/lib/staging/staging";
-import { OralCavityCase, TCategory, NCategory, StageGroup } from "@/lib/staging/types";
+import { OralCavityCase } from "@/lib/staging/types";
 
 function randIndex(n: number) {
   return Math.floor(Math.random() * n);
@@ -26,13 +33,14 @@ function randIndex(n: number) {
 /**
  * Case typing
  * - Oral cavity uses your existing OralCavityCase.
- * - Oropharynx HPV+ cases are a separate shape (from your new file).
+ * - Oropharynx HPV+ and HPV− are separate shapes from data files.
  * We’ll treat them as a union locally.
  */
 type OropharynxHPVPosCase = (typeof oropharynxHPVPosCases)[number];
-type AnyCase = OralCavityCase | OropharynxHPVPosCase;
+type OropharynxHPVNegCase = (typeof oropharynxHPVNegCases)[number];
+type AnyCase = OralCavityCase | OropharynxHPVPosCase | OropharynxHPVNegCase;
 
-type CasePool = "oral_cavity" | "oropharynx_hpv_pos" | "mixed";
+type CasePool = "oral_cavity" | "oropharynx_hpv_pos" | "oropharynx_hpv_neg" | "mixed";
 
 // All oral cavity cases (all subsites)
 const oralCavityCases: OralCavityCase[] = [
@@ -44,8 +52,8 @@ const oralCavityCases: OralCavityCase[] = [
   ...retromolarTrigoneCases,
 ];
 
-// Mixed pool: oral cavity + HPV+ OP
-const mixedCases: readonly AnyCase[] = [...oralCavityCases, ...oropharynxHPVPosCases];
+// Mixed pool: oral cavity + HPV+ OP + HPV− OP
+const mixedCases: readonly AnyCase[] = [...oralCavityCases, ...oropharynxHPVPosCases, ...oropharynxHPVNegCases];
 
 // Pool resolver
 function getCasesForPool(pool: CasePool): readonly AnyCase[] {
@@ -54,6 +62,8 @@ function getCasesForPool(pool: CasePool): readonly AnyCase[] {
       return oralCavityCases;
     case "oropharynx_hpv_pos":
       return oropharynxHPVPosCases;
+    case "oropharynx_hpv_neg":
+      return oropharynxHPVNegCases;
     case "mixed":
     default:
       return mixedCases;
@@ -84,28 +94,35 @@ function prettySubsiteLabel(subsite: OralCavityCase["subsite"]): string {
 
 function isOralCavityCase(c: AnyCase): c is OralCavityCase {
   // Oral cavity cases have these guaranteed fields in your type:
-  // - subsite is one of oral cavity subsites
-  // - tumor has doi_mm etc.
+  // - site_group === "oral_cavity" OR tumor has doi_mm etc.
   return (c as any)?.site_group === "oral_cavity" || (c as any)?.tumor?.doi_mm !== undefined;
 }
 
-function isOropharynxCase(c: AnyCase): c is OropharynxHPVPosCase {
+function isOropharynxHPVPosCase(c: AnyCase): c is OropharynxHPVPosCase {
   return (c as any)?.site_group === "oropharynx";
+}
+
+function isOropharynxHPVNegCase(c: AnyCase): c is OropharynxHPVNegCase {
+  return (c as any)?.site_group === "oropharynx_hpv_neg";
+}
+
+function isOropharynxCase(c: AnyCase): c is OropharynxHPVPosCase | OropharynxHPVNegCase {
+  const g = (c as any)?.site_group;
+  return g === "oropharynx" || g === "oropharynx_hpv_neg";
 }
 
 function prettySite(c: AnyCase) {
   if (isOropharynxCase(c)) {
-    // Keep it simple; your OP stem already contains laterality + symptom.
-    // You can refine later with subsite labels if desired.
-    const lat = c.stem?.laterality;
+    const lat = (c as any).stem?.laterality;
     const sub =
-      c.subsite === "base_of_tongue"
+      (c as any).subsite === "base_of_tongue"
         ? "base of tongue"
-        : c.subsite === "soft_palate"
+        : (c as any).subsite === "soft_palate"
         ? "soft palate"
-        : c.subsite === "pharyngeal_wall"
+        : (c as any).subsite === "pharyngeal_wall"
         ? "pharyngeal wall"
         : "tonsil";
+
     if (lat && lat !== "midline") return `${lat} ${sub} (oropharynx)`;
     if (lat === "midline") return `midline ${sub} (oropharynx)`;
     return `${sub} (oropharynx)`;
@@ -127,12 +144,7 @@ function renderStem(c: AnyCase) {
   if (s.age && s.sex) parts.push(`${s.age}-year-old ${s.sex}`);
 
   if (s.risk && s.risk !== "none") {
-    const riskLabel =
-      s.risk === "both"
-        ? "alcohol and tobacco"
-        : s.risk === "etoh"
-        ? "alcohol"
-        : s.risk;
+    const riskLabel = s.risk === "both" ? "alcohol and tobacco" : s.risk === "etoh" ? "alcohol" : s.risk;
     parts.push(`risk: ${riskLabel}`);
   }
 
@@ -165,9 +177,7 @@ function ChoiceGrid<T extends string>(props: {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: isMobile
-            ? "repeat(2, minmax(0, 1fr))"
-            : "repeat(4, minmax(0, 1fr))",
+          gridTemplateColumns: isMobile ? "repeat(2, minmax(0, 1fr))" : "repeat(4, minmax(0, 1fr))",
           gap: 10,
         }}
       >
@@ -257,12 +267,21 @@ export default function QuizPage() {
 
   const c = safeCases[clampedIdx];
 
+  // ---- answer state (string unions) ----
+  type AnyT = string;
+  type AnyN = string;
+  type AnyStage = string;
+
+  const [userT, setUserT] = useState<AnyT | "">("");
+  const [userN, setUserN] = useState<AnyN | "">("");
+  const [userStage, setUserStage] = useState<AnyStage | "">("");
+  const [submitted, setSubmitted] = useState(false);
+
   // If pool changes, ensure caseIdx is valid + reset answers
   useEffect(() => {
     const list = getCasesForPool(pool);
     const safeList = list && list.length > 0 ? list : mixedCases;
 
-    // Always pick a valid random index for the new pool
     const nextIdx = safeList.length > 0 ? randIndex(safeList.length) : 0;
     setCaseIdx(nextIdx);
 
@@ -292,10 +311,17 @@ export default function QuizPage() {
   }
 
   const correct = useMemo(() => {
-    if (isOropharynxCase(c)) {
+    if (isOropharynxHPVPosCase(c)) {
       const T = computeT_OropharynxHPVPos_Path(c.tumor);
       const N = computeN_OropharynxHPVPos_Path(c.nodes);
       const stage = computeStageGroup_OropharynxHPVPos_Path(T, N);
+      return { T, N, stage };
+    }
+
+    if (isOropharynxHPVNegCase(c)) {
+      const T = computeT_OropharynxHPVNeg(c.tumor);
+      const N = computeN_OropharynxHPVNeg(c.nodes);
+      const stage = computeStageGroup_OropharynxHPVNeg(T, N);
       return { T, N, stage };
     }
 
@@ -307,26 +333,12 @@ export default function QuizPage() {
     return { T, N, stage };
   }, [c]);
 
-  // ---- answer state (string unions) ----
-  // We keep these as strings so the same UI can handle both oral cavity and OP.
-  type AnyT = string;
-  type AnyN = string;
-  type AnyStage = string;
-
-  const [userT, setUserT] = useState<AnyT | "">("");
-  const [userN, setUserN] = useState<AnyN | "">("");
-  const [userStage, setUserStage] = useState<AnyStage | "">("");
-  const [submitted, setSubmitted] = useState(false);
-
-  const resetAnswers = () => {
+  const resetForNext = () => {
     setSubmitted(false);
     setUserT("");
     setUserN("");
     setUserStage("");
-  };
 
-  const resetForNext = () => {
-    resetAnswers();
     const list = getCasesForPool(pool) || mixedCases;
     const safeList = list.length > 0 ? list : mixedCases;
     const nextIdx = safeList.length > 0 ? randIndex(safeList.length) : 0;
@@ -336,24 +348,27 @@ export default function QuizPage() {
   const handlePoolChange = (next: CasePool) => {
     if (next === pool) return;
     setPool(next);
-    // the useEffect on [pool] will reset everything safely
   };
 
   const canSubmit = Boolean(userT && userN && userStage);
 
-  const isOP = isOropharynxCase(c);
+  const isOPPos = isOropharynxHPVPosCase(c);
+  const isOPNeg = isOropharynxHPVNegCase(c);
+  const isOP = isOPPos || isOPNeg;
 
-  // Choice sets depend on site
-  const tChoices = (isOP
-    ? (["T0", "T1", "T2", "T3", "T4"] as const)
-    : (["T1", "T2", "T3", "T4a"] as const)) as readonly string[];
+  // Choice sets depend on site (and HPV status for OP)
+  const tChoices = (isOP ? (["T0", "T1", "T2", "T3", "T4"] as const) : (["T1", "T2", "T3", "T4a"] as const)) as readonly string[];
 
-  const nChoices = (isOP
+  const nChoices = (isOPPos
     ? (["N0", "N1", "N2"] as const)
+    : isOPNeg
+    ? (["N0", "N1", "N2a", "N2b", "N2c", "N3a", "N3b"] as const)
     : (["N0", "N1", "N2a", "N2b", "N2c", "N3a", "N3b"] as const)) as readonly string[];
 
-  const stageChoices = (isOP
+  const stageChoices = (isOPPos
     ? (["I", "II", "III"] as const)
+    : isOPNeg
+    ? (["I", "II", "III", "IVA", "IVB"] as const)
     : (["I", "II", "III", "IVA", "IVB"] as const)) as readonly string[];
 
   const tCorrect = submitted && userT === correct.T;
@@ -363,38 +378,26 @@ export default function QuizPage() {
   // Findings renderer: handle both schemas without breaking styling
   const Findings = () => {
     if (isOropharynxCase(c)) {
+      const hpvLabel = isOropharynxHPVNegCase(c) ? "negative" : "positive";
+
       return (
-        <ul
-          style={{
-            marginTop: 0,
-            marginBottom: 0,
-            lineHeight: 1.7,
-            fontSize: 18,
-          }}
-        >
-          <li>Tumor size: {c.tumor.size_cm} cm</li>
-          <li>Advanced local extension: {c.tumor.advanced_local_extension ? "yes" : "no"}</li>
+        <ul style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7, fontSize: 18 }}>
+          <li>Tumor size: {(c as any).tumor.size_cm} cm</li>
+          <li>Advanced local extension: {(c as any).tumor.advanced_local_extension ? "yes" : "no"}</li>
           <li>
-            Nodes: positive nodes {c.nodes.positive_node_count}
-            {c.nodes.laterality ? `, laterality ${c.nodes.laterality}` : ""}
-            {typeof c.nodes.largest_node_cm === "number" ? `, largest ${c.nodes.largest_node_cm} cm` : ""}
-            {typeof c.nodes.ene === "boolean" ? `, ENE ${c.nodes.ene ? "yes" : "no"}` : ""}
+            Nodes: positive nodes {(c as any).nodes.positive_node_count}
+            {(c as any).nodes.laterality ? `, laterality ${(c as any).nodes.laterality}` : ""}
+            {typeof (c as any).nodes.largest_node_cm === "number" ? `, largest ${(c as any).nodes.largest_node_cm} cm` : ""}
+            {typeof (c as any).nodes.ene === "boolean" ? `, ENE ${(c as any).nodes.ene ? "yes" : "no"}` : ""}
           </li>
-          <li>HPV status: positive</li>
+          <li>HPV status: {hpvLabel}</li>
         </ul>
       );
     }
 
     const oc = c as OralCavityCase;
     return (
-      <ul
-        style={{
-          marginTop: 0,
-          marginBottom: 0,
-          lineHeight: 1.7,
-          fontSize: 18,
-        }}
-      >
+      <ul style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7, fontSize: 18 }}>
         <li>Tumor size: {oc.tumor.size_cm} cm</li>
         <li>Depth of invasion: {oc.tumor.doi_mm} mm</li>
         <li>Bone invasion: {oc.tumor.bone_invasion ? "yes" : "no"}</li>
@@ -421,16 +424,7 @@ export default function QuizPage() {
       }}
     >
       {/* CrabsMcChaffey header */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          textAlign: "center",
-          gap: 8,
-          marginBottom: 16,
-        }}
-      >
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 8, marginBottom: 16 }}>
         <Image
           src="/crabs.png"
           alt="CrabsMcChaffey crab logo"
@@ -442,39 +436,18 @@ export default function QuizPage() {
           }}
         />
 
-        <h1
-          style={{
-            margin: 0,
-            fontSize: 24,
-          }}
-        >
-          🦀🦀 CrabsMcChaffey Staging Ninja 🦀🦀
-        </h1>
+        <h1 style={{ margin: 0, fontSize: 24 }}>🦀🦀 CrabsMcChaffey Staging Ninja 🦀🦀</h1>
 
-        <p
-          style={{
-            margin: 0,
-            fontSize: 14,
-            color: "#9ca3af",
-          }}
-        >
-          Interactive TNM drills for HN Cancer Staging
-        </p>
+        <p style={{ margin: 0, fontSize: 14, color: "#9ca3af" }}>Interactive TNM drills for HN Cancer Staging</p>
       </div>
 
       {/* Pool toggle */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 6,
-          marginBottom: 12,
-        }}
-      >
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
         {(
           [
             ["oral_cavity", "Oral cavity"],
             ["oropharynx_hpv_pos", "Oropharynx (HPV+)"],
+            ["oropharynx_hpv_neg", "Oropharynx (HPV−)"],
             ["mixed", "Mixed"],
           ] as [CasePool, string][]
         ).map(([value, label]) => (
@@ -498,25 +471,9 @@ export default function QuizPage() {
         ))}
       </div>
 
-      <div
-        style={{
-          color: "#e5e7eb",
-          marginBottom: 16,
-          fontSize: 18,
-        }}
-      >
-        {renderStem(c)}
-      </div>
+      <div style={{ color: "#e5e7eb", marginBottom: 16, fontSize: 18 }}>{renderStem(c)}</div>
 
-      <div
-        style={{
-          border: "1px solid #4b5563",
-          borderRadius: 16,
-          padding: 18,
-          marginBottom: 18,
-          background: "#020617",
-        }}
-      >
+      <div style={{ border: "1px solid #4b5563", borderRadius: 16, padding: 18, marginBottom: 18, background: "#020617" }}>
         <div style={{ marginBottom: 10, fontSize: 18 }}>Findings</div>
         <Findings />
       </div>
@@ -594,24 +551,9 @@ export default function QuizPage() {
       </div>
 
       {submitted && (
-        <div
-          style={{
-            marginTop: 18,
-            border: "1px solid #4b5563",
-            borderRadius: 16,
-            padding: 18,
-            background: "#020617",
-          }}
-        >
+        <div style={{ marginTop: 18, border: "1px solid #4b5563", borderRadius: 16, padding: 18, background: "#020617" }}>
           <div style={{ marginBottom: 10, fontSize: 18 }}>Results</div>
-          <ul
-            style={{
-              marginTop: 0,
-              marginBottom: 0,
-              lineHeight: 1.7,
-              fontSize: 18,
-            }}
-          >
+          <ul style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7, fontSize: 18 }}>
             <li>
               T: your answer {userT} → {tCorrect ? "correct" : `wrong (correct: ${correct.T})`}
             </li>
@@ -619,20 +561,11 @@ export default function QuizPage() {
               N: your answer {userN} → {nCorrect ? "correct" : `wrong (correct: ${correct.N})`}
             </li>
             <li>
-              Stage: your answer {userStage} →{" "}
-              {stageCorrect ? "correct" : `wrong (correct: ${correct.stage})`}
+              Stage: your answer {userStage} → {stageCorrect ? "correct" : `wrong (correct: ${correct.stage})`}
             </li>
           </ul>
 
-          <div
-            style={{
-              marginTop: 12,
-              color: "#e5e7eb",
-              fontSize: 18,
-            }}
-          >
-            Teaching pearl: {(c as any).teaching_pearl}
-          </div>
+          <div style={{ marginTop: 12, color: "#e5e7eb", fontSize: 18 }}>Teaching pearl: {(c as any).teaching_pearl}</div>
         </div>
       )}
     </div>
