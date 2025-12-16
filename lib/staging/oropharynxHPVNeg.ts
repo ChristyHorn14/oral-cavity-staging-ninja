@@ -37,71 +37,34 @@ export function computeT_OropharynxHPVNeg(t: OropharynxHPVNegTumor): OropharynxN
 // Nodal (N) computation
 // -----------------------------
 
-export interface OropharynxHPVNegNodes {
-  positive_node_count: number;
-  laterality?: "ipsilateral" | "contralateral" | "bilateral" | "none" | "unknown";
-  largest_node_cm: number;
-  ene: boolean;
-}
+import {
+  computeN_HeadNeckHPVNeg,
+  computeStageGroup_HeadNeckClassic,
+  type HeadNeckN,
+  type HeadNeckStage,
+  type HeadNeckNodes,
+} from "@/lib/staging/commonHeadNeck";
+
+export type OropharynxNegN = HeadNeckN;
+export type OropharynxNegStage = HeadNeckStage;
+
+export interface OropharynxHPVNegNodes extends HeadNeckNodes {}
 
 export function computeN_OropharynxHPVNeg(n: OropharynxHPVNegNodes): OropharynxNegN {
-  if (n.positive_node_count === 0) return "N0";
-
-  // ENE+ is always N3b
-  if (n.ene) return "N3b";
-
-  // Size-based N3a
-  if (n.largest_node_cm > 6) return "N3a";
-
-  // Single node logic
-  if (n.positive_node_count === 1) {
-    if (n.largest_node_cm <= 3) return "N1";
-    return "N2a";
-  }
-
-  // Multiple nodes
-  if (n.laterality === "bilateral" || n.laterality === "contralateral") return "N2c";
-  return "N2b";
+  return computeN_HeadNeckHPVNeg(n);
 }
-
-// -----------------------------
-// Stage grouping (AJCC 8)
-// -----------------------------
 
 export function computeStageGroup_OropharynxHPVNeg(
   T: OropharynxNegT,
   N: OropharynxNegN
 ): OropharynxNegStage {
-  // IVB: T4b any N OR any N3
-  if (T === "T4b" || N === "N3a" || N === "N3b") return "IVB";
-
-  // I: T1 N0
-  if (T === "T1" && N === "N0") return "I";
-
-  // II: T2 N0
-  if (T === "T2" && N === "N0") return "II";
-
-  // III: T3 N0 OR T1–T3 N1
-  if (
-    (T === "T3" && N === "N0") ||
-    (N === "N1" && (T === "T1" || T === "T2" || T === "T3"))
-  ) return "III";
-
-  // IVA: T4a N0–N2 OR T1–T3 N2
-  return "IVA";
-}
-
-// -----------------------------
-// Dev-only invariants
-// -----------------------------
-
-if (process.env.NODE_ENV !== "production") {
-  const Ns: OropharynxNegN[] = ["N0", "N1", "N2a", "N2b", "N2c", "N3a", "N3b"];
-
-  for (const N of Ns) {
-    const stage = computeStageGroup_OropharynxHPVNeg("T4b", N);
-    if (stage !== "IVB") {
-      throw new Error(`Invariant failed: T4b ${N} staged as ${stage}`);
-    }
-  }
+  return computeStageGroup_HeadNeckClassic({
+    T,
+    N,
+    isT4a: (t) => t === "T4a",
+    isT4b: (t) => t === "T4b",
+    isT1: (t) => t === "T1",
+    isT2: (t) => t === "T2",
+    isT3: (t) => t === "T3",
+  });
 }

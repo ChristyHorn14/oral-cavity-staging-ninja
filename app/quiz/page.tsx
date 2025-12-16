@@ -23,6 +23,13 @@ import {
   computeStageGroup_OropharynxHPVNeg,
 } from "@/lib/staging/oropharynxHPVNeg";
 
+import { larynxGlotticCases } from "@/data/larynxGlotticCases";
+import {
+  computeT_LarynxGlottic,
+  computeN_LarynxGlottic,
+  computeStageGroup_LarynxGlottic,
+} from "@/lib/staging/larynxGlottic";
+
 import { computeT, computeN, computeStageGroup } from "@/lib/staging/staging";
 import { OralCavityCase } from "@/lib/staging/types";
 
@@ -34,13 +41,21 @@ function randIndex(n: number) {
  * Case typing
  * - Oral cavity uses your existing OralCavityCase.
  * - Oropharynx HPV+ and HPV− are separate shapes from data files.
+ * - Larynx glottic uses its own case shape from data file.
  * We’ll treat them as a union locally.
  */
 type OropharynxHPVPosCase = (typeof oropharynxHPVPosCases)[number];
 type OropharynxHPVNegCase = (typeof oropharynxHPVNegCases)[number];
-type AnyCase = OralCavityCase | OropharynxHPVPosCase | OropharynxHPVNegCase;
+type LarynxGlotticCase = (typeof larynxGlotticCases)[number];
 
-type CasePool = "oral_cavity" | "oropharynx_hpv_pos" | "oropharynx_hpv_neg" | "mixed";
+type AnyCase = OralCavityCase | OropharynxHPVPosCase | OropharynxHPVNegCase | LarynxGlotticCase;
+
+type CasePool =
+  | "oral_cavity"
+  | "oropharynx_hpv_pos"
+  | "oropharynx_hpv_neg"
+  | "larynx_glottic"
+  | "mixed";
 
 // All oral cavity cases (all subsites)
 const oralCavityCases: OralCavityCase[] = [
@@ -52,8 +67,13 @@ const oralCavityCases: OralCavityCase[] = [
   ...retromolarTrigoneCases,
 ];
 
-// Mixed pool: oral cavity + HPV+ OP + HPV− OP
-const mixedCases: readonly AnyCase[] = [...oralCavityCases, ...oropharynxHPVPosCases, ...oropharynxHPVNegCases];
+// Mixed pool: oral cavity + HPV+ OP + HPV− OP + Larynx (glottic)
+const mixedCases: readonly AnyCase[] = [
+  ...oralCavityCases,
+  ...oropharynxHPVPosCases,
+  ...oropharynxHPVNegCases,
+  ...larynxGlotticCases,
+];
 
 // Pool resolver
 function getCasesForPool(pool: CasePool): readonly AnyCase[] {
@@ -64,6 +84,8 @@ function getCasesForPool(pool: CasePool): readonly AnyCase[] {
       return oropharynxHPVPosCases;
     case "oropharynx_hpv_neg":
       return oropharynxHPVNegCases;
+    case "larynx_glottic":
+      return larynxGlotticCases;
     case "mixed":
     default:
       return mixedCases;
@@ -109,7 +131,15 @@ function isOropharynxCase(c: AnyCase): c is OropharynxHPVPosCase | OropharynxHPV
   return g === "oropharynx" || g === "oropharynx_hpv_neg";
 }
 
+function isLarynxGlotticCase(c: AnyCase): c is LarynxGlotticCase {
+  return (c as any)?.site_group === "larynx" && (c as any)?.subsite === "glottic";
+}
+
 function prettySite(c: AnyCase) {
+  if (isLarynxGlotticCase(c)) {
+    return "glottic larynx";
+  }
+
   if (isOropharynxCase(c)) {
     const lat = (c as any).stem?.laterality;
     const sub =
@@ -121,9 +151,9 @@ function prettySite(c: AnyCase) {
         ? "pharyngeal wall"
         : "tonsil";
 
-    if (lat && lat !== "midline") return `${lat} ${sub} (oropharynx)`;
-    if (lat === "midline") return `midline ${sub} (oropharynx)`;
-    return `${sub} (oropharynx)`;
+    if (lat && lat !== "midline") return `${lat} ${sub}`;
+    if (lat === "midline") return `midline ${sub}`;
+    return `${sub}`;
   }
 
   // Oral cavity
@@ -309,6 +339,13 @@ export default function QuizPage() {
   }
 
   const correct = useMemo(() => {
+    if (isLarynxGlotticCase(c)) {
+      const T = computeT_LarynxGlottic(c.tumor);
+      const N = computeN_LarynxGlottic(c.nodes);
+      const stage = computeStageGroup_LarynxGlottic(T as any, N as any);
+      return { T, N, stage };
+    }
+
     if (isOropharynxHPVPosCase(c)) {
       const T = computeT_OropharynxHPVPos_Path(c.tumor);
       const N = computeN_OropharynxHPVPos_Path(c.nodes);
@@ -354,37 +391,61 @@ export default function QuizPage() {
   const isOPNeg = isOropharynxHPVNegCase(c);
   const isOP = isOPPos || isOPNeg;
 
+  const isLarynx = isLarynxGlotticCase(c);
+
   // Choice sets depend on site (and HPV status for OP)
-  const tChoices = (isOPPos
+  const tChoices = (isLarynx
+    ? (["Tis", "T1", "T2", "T3", "T4a", "T4b"] as const)
+    : isOPPos
     ? (["T0", "T1", "T2", "T3", "T4"] as const)
     : isOPNeg
-    ? (["T1", "T2", "T3", "T4a", "T4b"] as const)
+    ? (["T0", "T1", "T2", "T3", "T4a", "T4b"] as const)
     : (["T1", "T2", "T3", "T4a", "T4b"] as const)) as readonly string[];
 
   const nChoices = (isOPPos
     ? (["N0", "N1", "N2"] as const)
-    : isOPNeg
-    ? (["N0", "N1", "N2a", "N2b", "N2c", "N3a", "N3b"] as const)
     : (["N0", "N1", "N2a", "N2b", "N2c", "N3a", "N3b"] as const)) as readonly string[];
 
-  const stageChoices = (isOPPos
+  const stageChoices = (isLarynx
+    ? (["0", "I", "II", "III", "IVA", "IVB"] as const)
+    : isOPPos
     ? (["I", "II", "III"] as const)
-    : isOPNeg
-    ? (["I", "II", "III", "IVA", "IVB"] as const)
     : (["I", "II", "III", "IVA", "IVB"] as const)) as readonly string[];
 
   const tCorrect = submitted && userT === correct.T;
   const nCorrect = submitted && userN === correct.N;
   const stageCorrect = submitted && userStage === correct.stage;
 
-  // Findings renderer: handle both schemas without breaking styling
+  // Findings renderer: handle larynx, oropharynx, oral cavity
   const Findings = () => {
+    if (isLarynxGlotticCase(c)) {
+      const tumor = (c as any).tumor ?? {};
+      const nodes = (c as any).nodes ?? {};
+
+      return (
+        <ul style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7, fontSize: 18 }}>
+          <li>Vocal cord mobility: {tumor.vocal_cord_mobility}</li>
+          <li>In situ (Tis): {tumor.in_situ ? "yes" : "no"}</li>
+          <li>Extends to supraglottis: {tumor.extends_to_supraglottis ? "yes" : "no"}</li>
+          <li>Extends to subglottis: {tumor.extends_to_subglottis ? "yes" : "no"}</li>
+          <li>Paraglottic space invasion: {tumor.paraglottic_space_invasion ? "yes" : "no"}</li>
+          <li>Cartilage through cortex / extralaryngeal extension : {tumor.cartilage_through_cortex_or_extralaryngeal ? "yes" : "no"}</li>
+          <li>Invades prevertebral space, encases carotid artery, or invades mediastinal structures: {tumor.very_advanced_extension ? "yes" : "no"}</li>
+          <li>
+            Nodes: positive nodes {nodes.positive_node_count}
+            {nodes.laterality ? `, laterality ${nodes.laterality}` : ""}
+            {typeof nodes.largest_node_cm === "number" ? `, largest ${nodes.largest_node_cm} cm` : ""}
+            {typeof nodes.ene === "boolean" ? `, ENE ${nodes.ene ? "yes" : "no"}` : ""}
+          </li>
+        </ul>
+      );
+    }
+
     if (isOropharynxCase(c)) {
       const hpvLabel = isOropharynxHPVNegCase(c) ? "negative" : "positive";
       const tumor = (c as any).tumor ?? {};
       const nodes = (c as any).nodes ?? {};
 
-      // NEW: show T4a vs T4b schema fields (safe even if missing)
       const adv = Boolean(tumor.advanced_local_extension);
       const veryAdv = Boolean(tumor.very_advanced_local_extension);
 
@@ -445,7 +506,7 @@ export default function QuizPage() {
           }}
         />
 
-        <h1 style={{ margin: 0, fontSize: 24 }}>🦀🦀 CrabsMcChaffey Staging Ninja 🦀🦀</h1>
+        <h1 style={{ margin: 0, fontSize: 24 }}>🦀🦀 CrabsMcChaffey Staging Dojo 🦀🦀</h1>
 
         <p style={{ margin: 0, fontSize: 14, color: "#9ca3af" }}>Interactive TNM drills for HN Cancer Staging</p>
       </div>
@@ -457,6 +518,7 @@ export default function QuizPage() {
             ["oral_cavity", "Oral cavity"],
             ["oropharynx_hpv_pos", "Oropharynx (HPV+)"],
             ["oropharynx_hpv_neg", "Oropharynx (HPV−)"],
+            ["larynx_glottic", "Larynx (glottic)"],
             ["mixed", "Mixed"],
           ] as [CasePool, string][]
         ).map(([value, label]) => (
