@@ -639,6 +639,35 @@ export default function QuizPage() {
           <div style={{ marginTop: 12, color: "#e5e7eb", fontSize: 18 }}>Teaching pearl: {(c as any).teaching_pearl}</div>
         </div>
       )}
-    </div>
-  );
+
+ <footer
+      style={{
+        marginTop: 28,
+        paddingTop: 14,
+        borderTop: "1px solid #4b5563",
+        color: "#9ca3af",
+        fontSize: 13,
+        lineHeight: 1.5,
+        textAlign: "center",
+      }}
+    >
+      <div>Built by Chris Hornung, MD</div>
+      <div>
+        Notes & write-ups:{" "}
+        <a
+          href="https://medium.com/@chrishornung14"
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: "#e5e7eb", textDecoration: "underline" }}
+        >
+          Medium
+        </a>
+      </div>
+    </footer>
+  </div>
+);   
+
+
+
+
 }
