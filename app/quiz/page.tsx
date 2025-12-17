@@ -8,6 +8,8 @@ import { buccalMucosaCases } from "@/data/buccalMucosaCases";
 import { hardPalateCases } from "@/data/hardPalateCases";
 import { retromolarTrigoneCases } from "@/data/retromolarTrigoneCases";
 import Image from "next/image";
+import CaseCountLine from "@/components/CaseCountLine";
+
 
 import { oropharynxHPVPosCases } from "@/data/oropharynxHPVPosCases";
 import {
@@ -323,6 +325,10 @@ export default function QuizPage() {
   const [userStage, setUserStage] = useState<AnyStage | "">("");
   const [submitted, setSubmitted] = useState(false);
 
+// ---- global counter protection ----
+const [countedThisCase, setCountedThisCase] = useState(false);
+
+
   // If pool changes, ensure caseIdx is valid + reset answers
   useEffect(() => {
     const list = getCasesForPool(pool);
@@ -335,6 +341,8 @@ export default function QuizPage() {
     setUserT("");
     setUserN("");
     setUserStage("");
+    setCountedThisCase(false);
+
   }, [pool]);
 
   // If something ever goes weird (shouldn't after clamping), fail gracefully
@@ -400,6 +408,8 @@ export default function QuizPage() {
     setUserT("");
     setUserN("");
     setUserStage("");
+    setCountedThisCase(false);
+
 
     const list = getCasesForPool(pool) || mixedCases;
     const safeList = list.length > 0 ? list : mixedCases;
@@ -659,7 +669,22 @@ export default function QuizPage() {
 
       <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
         <button
-          onClick={() => setSubmitted(true)}
+          onClick={async () => {
+  // lock UI first so rapid double clicks can't queue multiple increments
+  setSubmitted(true);
+
+  // increment the global counter exactly once per case
+  if (!countedThisCase) {
+    setCountedThisCase(true);
+    try {
+      await fetch("/api/case-count", { method: "POST" });
+    } catch {
+      // If Upstash/network blips, we just skip incrementing rather than breaking the quiz.
+      // (Optional: you could console.error here.)
+    }
+  }
+}}
+
           disabled={!canSubmit || submitted}
           style={{
             padding: "12px 16px",
@@ -732,6 +757,7 @@ export default function QuizPage() {
             Medium
           </a>
         </div>
+      <CaseCountLine />
       </footer>
     </div>
   );
