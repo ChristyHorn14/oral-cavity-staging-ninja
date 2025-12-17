@@ -491,6 +491,7 @@ const [countedThisCase, setCountedThisCase] = useState(false);
           <li>Cord mobility: {tumor.cord_mobility ?? "—"}</li>
           <li>In situ (Tis): {tumor.tis ? "yes" : "no"}</li>
           <li>Extends to glottis: {tumor.extends_to_glottis ? "yes" : "no"}</li>
+          <li>Extends to vallecula: {tumor.extends_to_vallecula ? "yes" : "no"}</li>
           <li>Invades pre-epiglottic space: {tumor.invades_pre_epiglottic_space ? "yes" : "no"}</li>
           <li>Invades paraglottic space: {tumor.invades_paraglottic_space ? "yes" : "no"}</li>
           <li>Invades postcricoid area: {tumor.invades_postcricoid_area ? "yes" : "no"}</li>
