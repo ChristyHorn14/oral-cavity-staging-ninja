@@ -30,6 +30,10 @@ import {
   computeStageGroup_LarynxGlottic,
 } from "@/lib/staging/larynxGlottic";
 
+// NEW: supraglottic imports (adjust paths if needed)
+import { larynxSupraglotticCases } from "@/data/larynxSupraglotticCases";
+import { computeT_Supraglottic } from "@/lib/staging/larynxSupraglotticStage";
+
 import { computeT, computeN, computeStageGroup } from "@/lib/staging/staging";
 import { OralCavityCase } from "@/lib/staging/types";
 
@@ -42,19 +46,27 @@ function randIndex(n: number) {
  * - Oral cavity uses your existing OralCavityCase.
  * - Oropharynx HPV+ and HPV− are separate shapes from data files.
  * - Larynx glottic uses its own case shape from data file.
+ * - Larynx supraglottic uses its own case shape from data file.
  * We’ll treat them as a union locally.
  */
 type OropharynxHPVPosCase = (typeof oropharynxHPVPosCases)[number];
 type OropharynxHPVNegCase = (typeof oropharynxHPVNegCases)[number];
 type LarynxGlotticCase = (typeof larynxGlotticCases)[number];
+type LarynxSupraglotticCase = (typeof larynxSupraglotticCases)[number];
 
-type AnyCase = OralCavityCase | OropharynxHPVPosCase | OropharynxHPVNegCase | LarynxGlotticCase;
+type AnyCase =
+  | OralCavityCase
+  | OropharynxHPVPosCase
+  | OropharynxHPVNegCase
+  | LarynxGlotticCase
+  | LarynxSupraglotticCase;
 
 type CasePool =
   | "oral_cavity"
   | "oropharynx_hpv_pos"
   | "oropharynx_hpv_neg"
   | "larynx_glottic"
+  | "larynx_supraglottic"
   | "mixed";
 
 // All oral cavity cases (all subsites)
@@ -67,12 +79,13 @@ const oralCavityCases: OralCavityCase[] = [
   ...retromolarTrigoneCases,
 ];
 
-// Mixed pool: oral cavity + HPV+ OP + HPV− OP + Larynx (glottic)
+// Mixed pool: oral cavity + HPV+ OP + HPV− OP + Larynx (glottic) + Larynx (supraglottic)
 const mixedCases: readonly AnyCase[] = [
   ...oralCavityCases,
   ...oropharynxHPVPosCases,
   ...oropharynxHPVNegCases,
   ...larynxGlotticCases,
+  ...larynxSupraglotticCases,
 ];
 
 // Pool resolver
@@ -86,6 +99,8 @@ function getCasesForPool(pool: CasePool): readonly AnyCase[] {
       return oropharynxHPVNegCases;
     case "larynx_glottic":
       return larynxGlotticCases;
+    case "larynx_supraglottic":
+      return larynxSupraglotticCases;
     case "mixed":
     default:
       return mixedCases;
@@ -135,10 +150,13 @@ function isLarynxGlotticCase(c: AnyCase): c is LarynxGlotticCase {
   return (c as any)?.site_group === "larynx" && (c as any)?.subsite === "glottic";
 }
 
+function isLarynxSupraglotticCase(c: AnyCase): c is LarynxSupraglotticCase {
+  return (c as any)?.site_group === "larynx" && (c as any)?.subsite === "supraglottic";
+}
+
 function prettySite(c: AnyCase) {
-  if (isLarynxGlotticCase(c)) {
-    return "glottic larynx";
-  }
+  if (isLarynxGlotticCase(c)) return "glottic larynx";
+  if (isLarynxSupraglotticCase(c)) return "supraglottic larynx";
 
   if (isOropharynxCase(c)) {
     const lat = (c as any).stem?.laterality;
@@ -340,22 +358,31 @@ export default function QuizPage() {
 
   const correct = useMemo(() => {
     if (isLarynxGlotticCase(c)) {
-      const T = computeT_LarynxGlottic(c.tumor);
-      const N = computeN_LarynxGlottic(c.nodes);
+      const T = computeT_LarynxGlottic((c as any).tumor);
+      const N = computeN_LarynxGlottic((c as any).nodes);
+      const stage = computeStageGroup_LarynxGlottic(T as any, N as any);
+      return { T, N, stage };
+    }
+
+    if (isLarynxSupraglotticCase(c)) {
+      // For now: compute supraglottic T using new logic.
+      // Reuse existing larynx N + stage-group (shared across larynx in AJCC 8).
+      const T = computeT_Supraglottic((c as any).tumor);
+      const N = computeN_LarynxGlottic((c as any).nodes);
       const stage = computeStageGroup_LarynxGlottic(T as any, N as any);
       return { T, N, stage };
     }
 
     if (isOropharynxHPVPosCase(c)) {
-      const T = computeT_OropharynxHPVPos_Path(c.tumor);
-      const N = computeN_OropharynxHPVPos_Path(c.nodes);
+      const T = computeT_OropharynxHPVPos_Path((c as any).tumor);
+      const N = computeN_OropharynxHPVPos_Path((c as any).nodes);
       const stage = computeStageGroup_OropharynxHPVPos_Path(T, N);
       return { T, N, stage };
     }
 
     if (isOropharynxHPVNegCase(c)) {
-      const T = computeT_OropharynxHPVNeg(c.tumor);
-      const N = computeN_OropharynxHPVNeg(c.nodes);
+      const T = computeT_OropharynxHPVNeg((c as any).tumor);
+      const N = computeN_OropharynxHPVNeg((c as any).nodes);
       const stage = computeStageGroup_OropharynxHPVNeg(T, N);
       return { T, N, stage };
     }
@@ -391,7 +418,7 @@ export default function QuizPage() {
   const isOPNeg = isOropharynxHPVNegCase(c);
   const isOP = isOPPos || isOPNeg;
 
-  const isLarynx = isLarynxGlotticCase(c);
+  const isLarynx = isLarynxGlotticCase(c) || isLarynxSupraglotticCase(c);
 
   // Choice sets depend on site (and HPV status for OP)
   const tChoices = (isLarynx
@@ -430,7 +457,36 @@ export default function QuizPage() {
           <li>Extends to subglottis: {tumor.extends_to_subglottis ? "yes" : "no"}</li>
           <li>Paraglottic space invasion: {tumor.paraglottic_space_invasion ? "yes" : "no"}</li>
           <li>Cartilage through cortex / extralaryngeal extension : {tumor.cartilage_through_cortex_or_extralaryngeal ? "yes" : "no"}</li>
-          <li>Invades prevertebral space, encases carotid artery, or invades mediastinal structures: {tumor.very_advanced_extension ? "yes" : "no"}</li>
+          <li>
+            Invades prevertebral space, encases carotid artery, or invades mediastinal structures:{" "}
+            {tumor.very_advanced_extension ? "yes" : "no"}
+          </li>
+          <li>
+            Nodes: positive nodes {nodes.positive_node_count}
+            {nodes.laterality ? `, laterality ${nodes.laterality}` : ""}
+            {typeof nodes.largest_node_cm === "number" ? `, largest ${nodes.largest_node_cm} cm` : ""}
+            {typeof nodes.ene === "boolean" ? `, ENE ${nodes.ene ? "yes" : "no"}` : ""}
+          </li>
+        </ul>
+      );
+    }
+
+    if (isLarynxSupraglotticCase(c)) {
+      const tumor = (c as any).tumor ?? {};
+      const nodes = (c as any).nodes ?? {};
+
+      return (
+        <ul style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7, fontSize: 18 }}>
+          <li>Supraglottic subsites involved: {Array.isArray(tumor.involved_supraglottic_subsites) ? tumor.involved_supraglottic_subsites.join(", ") : "—"}</li>
+          <li>Cord mobility: {tumor.cord_mobility ?? "—"}</li>
+          <li>In situ (Tis): {tumor.tis ? "yes" : "no"}</li>
+          <li>Extends to glottis: {tumor.extends_to_glottis ? "yes" : "no"}</li>
+          <li>Invades pre-epiglottic space: {tumor.invades_pre_epiglottic_space ? "yes" : "no"}</li>
+          <li>Invades paraglottic space: {tumor.invades_paraglottic_space ? "yes" : "no"}</li>
+          <li>Invades postcricoid area: {tumor.invades_postcricoid_area ? "yes" : "no"}</li>
+          <li>Inner cortex thyroid cartilage: {tumor.inner_cortex_thyroid_cartilage ? "yes" : "no"}</li>
+          <li>Extralaryngeal invasion: {Array.isArray(tumor.extralaryngeal_invasion) && tumor.extralaryngeal_invasion.length ? tumor.extralaryngeal_invasion.join(", ") : "no"}</li>
+          <li>Very advanced invasion: {Array.isArray(tumor.very_advanced_invasion) && tumor.very_advanced_invasion.length ? tumor.very_advanced_invasion.join(", ") : "no"}</li>
           <li>
             Nodes: positive nodes {nodes.positive_node_count}
             {nodes.laterality ? `, laterality ${nodes.laterality}` : ""}
@@ -453,7 +509,10 @@ export default function QuizPage() {
         <ul style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7, fontSize: 18 }}>
           <li>Tumor size: {tumor.size_cm} cm</li>
           <li>Invades the larynx, extrinsic muscle of tongue, medial pterygoid, hard palate, or mandible?: {adv ? "yes" : "no"}</li>
-          <li>Invades lateral pterygoid muscle, pterygoid plates, lateral nasopharynx, skull base, or encases carotid artery?: {veryAdv ? "yes" : "no"}</li>
+          <li>
+            Invades lateral pterygoid muscle, pterygoid plates, lateral nasopharynx, skull base, or encases carotid artery?:{" "}
+            {veryAdv ? "yes" : "no"}
+          </li>
           <li>
             Nodes: positive nodes {nodes.positive_node_count}
             {nodes.laterality ? `, laterality ${nodes.laterality}` : ""}
@@ -494,7 +553,16 @@ export default function QuizPage() {
       }}
     >
       {/* CrabsMcChaffey header */}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 8, marginBottom: 16 }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+          gap: 8,
+          marginBottom: 16,
+        }}
+      >
         <Image
           src="/crabs.png"
           alt="CrabsMcChaffey crab logo"
@@ -519,6 +587,7 @@ export default function QuizPage() {
             ["oropharynx_hpv_pos", "Oropharynx (HPV+)"],
             ["oropharynx_hpv_neg", "Oropharynx (HPV−)"],
             ["larynx_glottic", "Larynx (glottic)"],
+            ["larynx_supraglottic", "Larynx (supraglottic)"],
             ["mixed", "Mixed"],
           ] as [CasePool, string][]
         ).map(([value, label]) => (
@@ -640,34 +709,30 @@ export default function QuizPage() {
         </div>
       )}
 
- <footer
-      style={{
-        marginTop: 28,
-        paddingTop: 14,
-        borderTop: "1px solid #4b5563",
-        color: "#9ca3af",
-        fontSize: 13,
-        lineHeight: 1.5,
-        textAlign: "center",
-      }}
-    >
-      <div>Built by Chris Hornung, MD</div>
-      <div>
-        Notes & write-ups:{" "}
-        <a
-          href="https://medium.com/@chrishornung14"
-          target="_blank"
-          rel="noreferrer"
-          style={{ color: "#e5e7eb", textDecoration: "underline" }}
-        >
-          Medium
-        </a>
-      </div>
-    </footer>
-  </div>
-);   
-
-
-
-
+      <footer
+        style={{
+          marginTop: 28,
+          paddingTop: 14,
+          borderTop: "1px solid #4b5563",
+          color: "#9ca3af",
+          fontSize: 13,
+          lineHeight: 1.5,
+          textAlign: "center",
+        }}
+      >
+        <div>Built by Chris Hornung, MD</div>
+        <div>
+          Notes & write-ups:{" "}
+          <a
+            href="https://medium.com/@chrishornung14"
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: "#e5e7eb", textDecoration: "underline" }}
+          >
+            Medium
+          </a>
+        </div>
+      </footer>
+    </div>
+  );
 }
