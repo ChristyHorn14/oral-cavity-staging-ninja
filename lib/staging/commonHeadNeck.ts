@@ -12,25 +12,49 @@ export interface HeadNeckNodes {
   ene: boolean;
 }
 
+// HPV-negative style nodal staging used across most non-OP sites (larynx, hypopharynx, oral cavity, etc.)
 export function computeN_HeadNeckHPVNeg(n: HeadNeckNodes): HeadNeckN {
-  if (n.positive_node_count === 0) return "N0";
+  const count = typeof n.positive_node_count === "number" ? n.positive_node_count : 0;
+  const lat = n.laterality ?? "unknown";
+  const size = typeof n.largest_node_cm === "number" ? n.largest_node_cm : 0;
+  const ene = Boolean(n.ene);
 
-  // ENE+ => N3b
-  if (n.ene) return "N3b";
+  // N0
+  if (count === 0) return "N0";
 
-  // Node > 6 cm (ENE-) => N3a
-  if (n.largest_node_cm > 6) return "N3a";
+  // ENE+ => N3b (MVP simplification you already had)
+  if (ene) return "N3b";
 
-  // Single node
-  if (n.positive_node_count === 1) {
-    if (n.largest_node_cm <= 3) return "N1";
-    return "N2a";
+  // Size > 6 cm (ENE-) => N3a
+  if (size > 6) return "N3a";
+
+  // Contralateral or bilateral (ENE-, size <= 6) => N2c
+  if (lat === "contralateral" || lat === "bilateral") {
+    return "N2c";
   }
 
-  // Multiple nodes
-  if (n.laterality === "bilateral" || n.laterality === "contralateral") return "N2c";
+  // Ipsilateral logic (ENE-, size <= 6)
+  if (lat === "ipsilateral") {
+    // single ipsi <=3 => N1
+    if (count === 1 && size <= 3) return "N1";
+
+    // single ipsi >3 and <=6 => N2a
+    if (count === 1 && size > 3 && size <= 6) return "N2a";
+
+    // multiple ipsi, all <=6 => N2b
+    if (count >= 2) return "N2b";
+
+    // fallback
+    return "N2b";
+  }
+
+  // Unknown laterality: be conservative but not wrong-mostly
+  // If single small node, call it N1-ish; otherwise N2b-ish.
+  if (count === 1 && size <= 3) return "N1";
+  if (count === 1 && size <= 6) return "N2a";
   return "N2b";
 }
+
 
 /**
  * Classic stage grouping pattern used across many HPV-negative H&N sites.
