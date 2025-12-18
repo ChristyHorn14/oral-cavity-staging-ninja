@@ -4,7 +4,7 @@ export type OropharynxT = "T0" | "T1" | "T2" | "T3" | "T4";
 export type OropharynxPN = "N0" | "N1" | "N2";
 export type OropharynxStage = "I" | "II" | "III";
 
-export type OropharynxSubsite = "tonsil" | "base_of_tongue" | "soft_palate" | "pharyngeal_wall";
+export type OropharynxSubsite = "tonsil" | "base_of_tongue" | "soft_palate" | "pharyngeal_wall" | "unknown_primary";
 
 export interface OropharynxTumorInputs {
   // AJCC8 HPV+ OPSCC pathologic-style MVP:

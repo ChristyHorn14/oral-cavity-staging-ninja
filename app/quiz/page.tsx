@@ -169,6 +169,8 @@ function prettySite(c: AnyCase) {
         ? "soft palate"
         : (c as any).subsite === "pharyngeal_wall"
         ? "pharyngeal wall"
+        : (c as any).subsite === "unknown_primary"
+        ? "unknown primary"
         : "tonsil";
 
     if (lat && lat !== "midline") return `${lat} ${sub}`;
@@ -746,16 +748,16 @@ const [countedThisCase, setCountedThisCase] = useState(false);
           textAlign: "center",
         }}
       >
-        <div>Built by Chris Hornung, MD</div>
+
         <div>
-          Notes & write-ups:{" "}
+          Built by{" "}
           <a
             href="https://medium.com/@chrishornung14"
             target="_blank"
             rel="noreferrer"
             style={{ color: "#e5e7eb", textDecoration: "underline" }}
           >
-            Medium
+            Chris Hornung, MD
           </a>
         </div>
       <CaseCountLine />
