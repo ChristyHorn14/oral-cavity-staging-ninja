@@ -51,14 +51,6 @@ import { computeT_LarynxSubglottic } from "@/lib/staging/larynxSubglotticStage";
 import { hypopharynxCases } from "@/data/hypopharynxCases";
 import { computeT_Hypopharynx } from "@/lib/staging/hypopharynxStage";
 
-// ---- Maxillary sinus ----
-import { maxillarySinusCases } from "@/data/maxillarySinusCases";
-import {
-  computeT_MaxillarySinus,
-  computeN_MaxillarySinus,
-  computeStageGroup_MaxillarySinus,
-} from "@/lib/staging/maxillarySinusStage";
-
 function randIndex(n: number) {
   return Math.floor(Math.random() * n);
 }
@@ -107,7 +99,6 @@ type OropharynxHPVNegCase = (typeof oropharynxHPVNegCases)[number];
 type LarynxGlotticCase = (typeof larynxGlotticCases)[number];
 type LarynxSupraglotticCase = (typeof larynxSupraglotticCases)[number];
 type HypopharynxCase = (typeof hypopharynxCases)[number];
-type MaxillarySinusCase = (typeof maxillarySinusCases)[number];
 
 // “inputs-shaped” subglottic case (from your de-keyed file)
 type SubglotticInputsCase = {
@@ -126,7 +117,6 @@ type AnyCase =
   | LarynxGlotticCase
   | LarynxSupraglotticCase
   | HypopharynxCase
-  | MaxillarySinusCase
   | SubglotticInputsCase
   | any;
 
@@ -138,7 +128,6 @@ type CasePool =
   | "larynx_supraglottic"
   | "larynx_subglottic"
   | "hypopharynx"
-  | "maxillary_sinus"
   | "mixed";
 
 // All oral cavity cases (all subsites)
@@ -160,7 +149,6 @@ const mixedCases: readonly AnyCase[] = [
   ...larynxSupraglotticCases,
   ...larynxSubglotticCases,
   ...hypopharynxCases,
-  ...maxillarySinusCases,
 ];
 
 function getCasesForPool(pool: CasePool): readonly AnyCase[] {
@@ -179,8 +167,6 @@ function getCasesForPool(pool: CasePool): readonly AnyCase[] {
       return larynxSubglotticCases;
     case "hypopharynx":
       return hypopharynxCases;
-    case "maxillary_sinus":
-      return maxillarySinusCases;
     case "mixed":
     default:
       return mixedCases;
@@ -227,10 +213,6 @@ function isHypopharynxCase(c: AnyCase): c is HypopharynxCase {
   return (c as any)?.site_group === "hypopharynx";
 }
 
-function isMaxillarySinusCase(c: AnyCase): c is MaxillarySinusCase {
-  return (c as any)?.site_group === "paranasal_sinus" && (c as any)?.subsite === "maxillary_sinus";
-}
-
 // ---- Helpers for display ----
 function prettySubsiteLabel(subsite: OralCavityCase["subsite"]): string {
   switch (subsite) {
@@ -256,7 +238,6 @@ function prettySite(c: AnyCase) {
   if (isLarynxSupraglotticCase(c)) return "supraglottic larynx";
   if (isLarynxSubglotticStructuredCase(c) || isLarynxSubglotticInputsCase(c)) return "subglottic larynx";
   if (isHypopharynxCase(c)) return "hypopharynx";
-  if (isMaxillarySinusCase(c)) return "maxillary sinus";
 
   if (isOropharynxCase(c)) {
     const lat = (c as any).stem?.laterality;
@@ -513,10 +494,6 @@ export default function QuizPage() {
 
   const c = safeCases[clampedIdx];
 
-  const feedbackUrl = c?.id
-    ? `https://docs.google.com/forms/d/e/1FAIpQLSebfGEEnAVhneAXZsHibWc_64qfJ9Q8tXXQ3YnaXgd4YKjHJA/viewform?usp=pp_url&entry.1860175722=${encodeURIComponent(c.id)}`
-    : "https://docs.google.com/forms/d/e/1FAIpQLSebfGEEnAVhneAXZsHibWc_64qfJ9Q8tXXQ3YnaXgd4YKjHJA/viewform";
-
   type AnyT = string;
   type AnyN = string;
   type AnyStage = string;
@@ -599,14 +576,6 @@ export default function QuizPage() {
       return { T, N, stage };
     }
 
-    // Maxillary sinus
-    if (isMaxillarySinusCase(c)) {
-      const T = normalizeT(computeT_MaxillarySinus((c as any).tumor));
-      const N = computeN_MaxillarySinus(getNodesOrDefault(c));
-      const stage = computeStageGroup_MaxillarySinus(T as any, N as any);
-      return { T, N, stage };
-    }
-
     // Oropharynx HPV+
     if (isOropharynxHPVPosCase(c)) {
       const T = normalizeT(computeT_OropharynxHPVPos_Path((c as any).tumor));
@@ -661,14 +630,11 @@ export default function QuizPage() {
   const isLarynx =
     isLarynxGlotticCase(c) || isLarynxSupraglotticCase(c) || isLarynxSubglotticStructuredCase(c) || isLarynxSubglotticInputsCase(c);
   const isHypo = isHypopharynxCase(c);
-  const isMaxSin = isMaxillarySinusCase(c);
 
   const tChoices = (isLarynx
     ? (["Tis", "T1", "T2", "T3", "T4a", "T4b"] as const)
     : isHypo
     ? (["Tis", "T1", "T2", "T3", "T4a", "T4b"] as const)
-    : isMaxSin
-    ? (["T1", "T2", "T3", "T4a", "T4b"] as const)
     : isOPPos
     ? (["T0", "T1", "T2", "T3", "T4"] as const)
     : isOPNeg
@@ -692,49 +658,6 @@ export default function QuizPage() {
   const stageCorrect = submitted && userStage === correct.stage;
 
   const Findings = () => {
-if (isMaxillarySinusCase(c)) {
-  const tumor = (c as any).tumor ?? {};
-  const nodes = getNodesOrDefault(c);
-
-  const involvedStructures = [
-    ["Bone erosion/destruction", tumor.bone_erosion_or_destruction],
-    ["Hard palate", tumor.hard_palate],
-    ["Middle nasal meatus", tumor.middle_nasal_meatus],
-    ["Posterior maxillary sinus wall", tumor.posterior_wall_maxillary_sinus],
-    ["Subcutaneous tissues", tumor.subcutaneous_tissues],
-    ["Orbital floor / medial wall", tumor.orbital_floor_or_medial_wall],
-    ["Pterygoid fossa", tumor.pterygoid_fossa],
-    ["Ethmoid sinus", tumor.ethmoid_sinus],
-    ["Anterior orbital contents", tumor.anterior_orbital_contents],
-    ["Cheek skin", tumor.cheek_skin],
-    ["Pterygoid plates", tumor.pterygoid_plates],
-    ["Infratemporal fossa", tumor.infratemporal_fossa],
-    ["Cribriform plate", tumor.cribriform_plate],
-    ["Sphenoid sinus", tumor.sphenoid_sinus],
-    ["Frontal sinus", tumor.frontal_sinus],
-    ["Orbital apex", tumor.orbital_apex],
-    ["Dura", tumor.dura],
-    ["Brain", tumor.brain],
-    ["Middle cranial fossa", tumor.middle_cranial_fossa],
-    ["Cranial nerve other than V2", tumor.cranial_nerve_other_than_v2],
-    ["Nasopharynx", tumor.nasopharynx],
-    ["Clivus", tumor.clivus],
-  ].filter(([, present]) => Boolean(present));
-
-  return (
-    <ul style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7, fontSize: 18 }}>
-      <li>Primary site: maxillary sinus</li>
-      <li>Involved structures: {involvedStructures.length ? involvedStructures.map(([label]) => label).join(", ") : "maxillary sinus mucosa only"}</li>
-      <li>
-        Nodes: positive nodes {nodes.positive_node_count}
-        {nodes.laterality ? `, laterality ${nodes.laterality}` : ""}
-        {typeof nodes.largest_node_cm === "number" ? `, largest ${nodes.largest_node_cm} cm` : ""}
-        {typeof nodes.ene === "boolean" ? `, ENE ${nodes.ene ? "yes" : "no"}` : ""}
-      </li>
-    </ul>
-  );
-}
-
 if (isLarynxSubglotticInputsCase(c) || isLarynxSubglotticStructuredCase(c)) {
   const tumor = isLarynxSubglotticInputsCase(c) ? (c as any).inputs ?? {} : (c as any).tumor ?? {};
   const nodes = getNodesOrDefault(c);
@@ -956,7 +879,6 @@ if (isHypopharynxCase(c)) {
             ["larynx_supraglottic", "Larynx (supraglottic)"],
             ["larynx_subglottic", "Larynx (subglottic)"],
             ["hypopharynx", "Hypopharynx"],
-            ["maxillary_sinus", "Maxillary sinus"],
             ["mixed", "Mixed"],
           ] as [CasePool, string][]
         ).map(([value, label]) => (
@@ -1087,18 +1009,6 @@ if (isHypopharynxCase(c)) {
 
           <div style={{ marginTop: 12, color: "#e5e7eb", fontSize: 18 }}>
             Teaching pearl: {(c as any).teaching_pearl ?? "—"}
-          </div>
-
-          <div style={{ marginTop: 14, fontSize: 14, color: "#9ca3af" }}>
-            Think something is incorrect?{" "}
-            <a
-              href={feedbackUrl}
-              target="_blank"
-              rel="noreferrer"
-              style={{ color: "#e5e7eb", textDecoration: "underline" }}
-            >
-              Report an issue
-            </a>
           </div>
         </div>
       )}
