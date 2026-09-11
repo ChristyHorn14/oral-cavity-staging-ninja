@@ -152,7 +152,7 @@ export const alveolarRidgeCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "T4a tumor with a single ipsilateral node ≤3 cm without ENE corresponds to N1.",
+      "T4a tumor with a single ipsilateral node ≤3 cm without clinically overt ENE corresponds to N1.",
   },
   {
     id: "ar-008",
@@ -178,7 +178,7 @@ export const alveolarRidgeCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Single ipsilateral node 3–6 cm without ENE is N2a in AJCC8.",
+      "Single ipsilateral node 3–6 cm without clinically overt ENE is N2a in AJCC8.",
   },
   {
     id: "ar-009",
@@ -204,7 +204,7 @@ export const alveolarRidgeCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Multiple ipsilateral nodes ≤6 cm without ENE are staged N2b.",
+      "Multiple ipsilateral nodes ≤6 cm without clinically overt ENE are staged N2b.",
   },
   {
     id: "ar-010",
@@ -230,7 +230,7 @@ export const alveolarRidgeCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Any contralateral nodal disease ≤6 cm without ENE is N2c.",
+      "Any contralateral nodal disease ≤6 cm without clinically overt ENE is N2c.",
   },
   {
     id: "ar-011",
@@ -256,7 +256,7 @@ export const alveolarRidgeCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "A node >6 cm without ENE is N3a in AJCC8 nodal staging.",
+      "A node >6 cm without clinically overt ENE is N3a in AJCC8 nodal staging.",
   },
   {
     id: "ar-012",
@@ -282,7 +282,7 @@ export const alveolarRidgeCases: OralCavityCase[] = [
       ene: true,
     },
     teaching_pearl:
-      "Any ENE-positive node is N3b, regardless of size in this MVP logic.",
+      "Clinically overt ENE in multiple ipsilateral nodes is cN3b; the single ipsilateral node ≤3 cm exception would be cN2a.",
   },
   {
     id: "ar-013",
@@ -355,6 +355,6 @@ export const alveolarRidgeCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Bilateral nodes ≤6 cm without ENE are considered N2c in AJCC8.",
+      "Bilateral nodes ≤6 cm without clinically overt ENE are considered N2c in AJCC8.",
   },
 ];

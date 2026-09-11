@@ -364,7 +364,7 @@ export const larynxSupraglotticCases: readonly LarynxSupraglotticCase[] = [
       very_advanced_invasion: [],
     },
     nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.1, ene: true },
-    teaching_pearl: "Fixation drives T3; ENE affects N (and therefore stage group), not T.",
+    teaching_pearl: "Fixation drives T3. A single ipsilateral node ≤3 cm with clinically overt ENE is cN2a, producing stage IVA.",
   },
   {
     site_group: "larynx",
@@ -597,7 +597,7 @@ export const larynxSupraglotticCases: readonly LarynxSupraglotticCase[] = [
       very_advanced_invasion: [],
     },
     nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.9, ene: true },
-    teaching_pearl: "Paraglottic space invasion → T3; ENE is an N feature.",
+    teaching_pearl: "Paraglottic-space invasion is T3. A single ipsilateral node ≤3 cm with clinically overt ENE is cN2a, not cN3b.",
   },
   {
     site_group: "larynx",

@@ -25,7 +25,7 @@ export interface OropharynxHPVNegTumor {
   very_advanced_local_extension?: boolean;
 }
 
-export interface OropharynxHPVNegNodes extends HeadNeckNodes {}
+export type OropharynxHPVNegNodes = HeadNeckNodes;
 
 export function computeT_OropharynxHPVNeg(t: OropharynxHPVNegTumor): OropharynxNegT {
   const size = t.size_cm ?? 0;

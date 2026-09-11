@@ -311,39 +311,6 @@ export const larynxSubglotticCases: LarynxSubglotticCase[] = [
     nodes: { positive_node_count: 0, laterality: "none", largest_node_cm: 0, ene: false },
   },
   {
-    id: "subglottic-017",
-    prompt: "Workup for suspected laryngeal primary is negative; no primary tumor identified.",
-    inputs: {
-      primary_tumor_assessable: true,
-      no_primary_tumor_identified: true,
-      limited_to_subglottis: false,
-      extends_to_vocal_cord: false,
-      vocal_cord_mobility: "unknown",
-      paraglottic_space_invasion: false,
-      thyroid_cartilage: "none",
-      extralaryngeal_extension: "none",
-      unresectable_feature: "none",
-    },
-    expectedT: "t0",
-    teaching_pearl: "If explicitly no primary tumor: T0.",
-    nodes: { positive_node_count: 1, laterality: "unknown", largest_node_cm: 1.4, ene: false },
-  },
-  {
-    id: "subglottic-018",
-    prompt:
-      "Outside records are incomplete; clinician documents that the primary tumor cannot be assessed.",
-    inputs: {
-      primary_tumor_assessable: false,
-      limited_to_subglottis: false,
-      extends_to_vocal_cord: false,
-      paraglottic_space_invasion: false,
-    },
-    expectedT: "tx",
-    teaching_pearl:
-      "If you cannot assess the primary tumor: TX. When the primary tumor cannot be assessed (TX), overall stage grouping cannot be assigned.",
-    nodes: { positive_node_count: 2, laterality: "ipsilateral", largest_node_cm: 3.1, ene: false },
-  },
-  {
     id: "subglottic-019",
     prompt:
       "Sparse documentation: subglottic malignancy is noted, but the note lacks clear descriptors of mobility or extension.",

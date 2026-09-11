@@ -84,7 +84,7 @@ export const buccalMucosaCases: OralCavityCase[] = [
     },
     nodes: { node_count: 0, laterality: "none", largest_node_cm: 0, ene: false },
     teaching_pearl:
-      "Tumors >4 cm or DOI >10 mm are T3 in oral cavity staging if no T4 features.",
+      "A tumor that is both >4 cm and >10 mm deep is T4a in AJCC 8 oral-cavity staging; either feature alone can be T3.",
   },
   {
     id: "bm-005",
@@ -131,7 +131,7 @@ export const buccalMucosaCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Single ipsilateral node ≤3 cm without ENE is N1 regardless of subsite.",
+      "Single ipsilateral node ≤3 cm without clinically overt ENE is N1 regardless of subsite.",
   },
   {
     id: "bm-007",
@@ -157,7 +157,7 @@ export const buccalMucosaCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Single ipsilateral node 3–6 cm without ENE is N2a in AJCC8.",
+      "Single ipsilateral node 3–6 cm without clinically overt ENE is N2a in AJCC8.",
   },
   {
     id: "bm-008",
@@ -183,7 +183,7 @@ export const buccalMucosaCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Multiple ipsilateral nodes ≤6 cm without ENE stage as N2b.",
+      "Multiple ipsilateral nodes ≤6 cm without clinically overt ENE stage as N2b.",
   },
   {
     id: "bm-009",
@@ -209,7 +209,7 @@ export const buccalMucosaCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Bilateral cervical nodes ≤6 cm without ENE are N2c.",
+      "Bilateral cervical nodes ≤6 cm without clinically overt ENE are N2c.",
   },
   {
     id: "bm-010",
@@ -235,7 +235,7 @@ export const buccalMucosaCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Any node >6 cm without ENE is N3a; this often corresponds to stage IVA/IVB.",
+      "Any node >6 cm without clinically overt ENE is cN3a and therefore makes M0 oral-cavity cancer stage IVB.",
   },
   {
     id: "bm-011",
@@ -251,8 +251,8 @@ export const buccalMucosaCases: OralCavityCase[] = [
       size_cm: 2.8,
       doi_mm: 9,
       bone_invasion: false,
-      extrinsic_muscle_involved: true,
-      skin_invasion: false,
+      extrinsic_muscle_involved: false,
+      skin_invasion: true,
     },
     nodes: {
       node_count: 2,
@@ -261,7 +261,7 @@ export const buccalMucosaCases: OralCavityCase[] = [
       ene: true,
     },
     teaching_pearl:
-      "Extrinsic muscle involvement is T4a; ENE-positive nodes are N3b in this MVP logic.",
+      "Invasion through the buccal mucosa into facial skin is T4a; clinically overt ENE makes the cervical nodes cN3b.",
   },
   {
     id: "bm-012",

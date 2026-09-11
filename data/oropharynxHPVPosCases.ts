@@ -1,314 +1,128 @@
-// data/oropharynxHPVPosCases.ts
-export const oropharynxHPVPosCases = [
-  // -------------------------
-  // Tonsil
-  // -------------------------
-  {
-    id: "OPHPV-001",
-    site_group: "oropharynx",
-    subsite: "tonsil",
-    stem: { age: 54, sex: "male", risk: "none", symptom: "sore throat", laterality: "right" },
-    tumor: { size_cm: 1.8, advanced_local_extension: false },
-    nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 3.2, ene: false },
-    teaching_pearl: "HPV+ OP SCC often presents with nodal disease despite a small primary.",
-  },
-  {
-    id: "OPHPV-002",
-    site_group: "oropharynx",
-    subsite: "tonsil",
-    stem: { age: 49, sex: "male", risk: "none", symptom: "neck mass", laterality: "right" },
-    tumor: { size_cm: 2.4, advanced_local_extension: false },
-    nodes: { positive_node_count: 2, laterality: "ipsilateral", largest_node_cm: 4.0, ene: false },
-    teaching_pearl: "In HPV+ OP, pN is driven by positive node count (path staging).",
-  },
-  {
-    id: "OPHPV-003",
-    site_group: "oropharynx",
-    subsite: "tonsil",
-    stem: { age: 58, sex: "female", risk: "none", symptom: "odynophagia", laterality: "left" },
-    tumor: { size_cm: 3.1, advanced_local_extension: false },
-    nodes: { positive_node_count: 4, laterality: "ipsilateral", largest_node_cm: 2.6, ene: false },
-    teaching_pearl: "Four positive nodes is the upper edge of pN1 in HPV+ OP path staging.",
-  },
-  {
-    id: "OPHPV-004",
-    site_group: "oropharynx",
-    subsite: "tonsil",
-    stem: { age: 63, sex: "male", risk: "both", symptom: "tonsillar mass", laterality: "right" },
-    tumor: { size_cm: 4.4, advanced_local_extension: false },
-    nodes: { positive_node_count: 3, laterality: "ipsilateral", largest_node_cm: 3.5, ene: true },
-    teaching_pearl: "ENE is prognostically important; pN (HPV+ path) still keys off node count.",
-  },
-  {
-    id: "OPHPV-005",
-    site_group: "oropharynx",
-    subsite: "tonsil",
-    stem: { age: 46, sex: "male", risk: "none", symptom: "trismus", laterality: "right" },
-    tumor: { size_cm: 2.0, advanced_local_extension: true },
-    nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.1, ene: false },
-    teaching_pearl: "Advanced local extension can upstage T even with limited nodal disease.",
-  },
-  {
-    id: "OPHPV-006",
-    site_group: "oropharynx",
-    subsite: "tonsil",
-    stem: { age: 52, sex: "female", risk: "etoh", symptom: "foreign body sensation", laterality: "left" },
-    tumor: { size_cm: 1.2, advanced_local_extension: false },
-    nodes: { positive_node_count: 0, laterality: "unknown", largest_node_cm: 0, ene: false },
-    teaching_pearl: "Some HPV+ OP tumors are node-negative at presentation (pN0).",
-  },
-  {
-    id: "OPHPV-007",
-    site_group: "oropharynx",
-    subsite: "tonsil",
-    stem: { age: 41, sex: "male", risk: "none", symptom: "neck mass", laterality: "left" },
-    tumor: { size_cm: 1.4, advanced_local_extension: false },
-    nodes: { positive_node_count: 4, laterality: "ipsilateral", largest_node_cm: 3.3, ene: false },
-    teaching_pearl: "Bulky nodes can occur even when pN remains N1 by node count criteria.",
-  },
+import type {
+  OropharynxHPVPosNodesInput,
+  OropharynxHPVPosTumorInput,
+} from "@/lib/staging/oropharynxHPVPos";
 
-  // -------------------------
-  // Base of tongue
-  // -------------------------
-  {
-    id: "OPHPV-008",
-    site_group: "oropharynx",
-    subsite: "base_of_tongue",
-    stem: { age: 47, sex: "male", risk: "none", symptom: "neck mass", laterality: "left" },
-    tumor: { size_cm: 2.5, advanced_local_extension: false },
-    nodes: { positive_node_count: 3, laterality: "ipsilateral", largest_node_cm: 4.1, ene: false },
-    teaching_pearl: "BOT primaries can be subtle; nodal disease is commonly the presenting sign.",
-  },
-  {
-    id: "OPHPV-009",
-    site_group: "oropharynx",
-    subsite: "base_of_tongue",
-    stem: { age: 61, sex: "male", risk: "none", symptom: "dysphagia", laterality: "midline" },
-    tumor: { size_cm: 3.6, advanced_local_extension: false },
-    nodes: { positive_node_count: 5, laterality: "bilateral", largest_node_cm: 3.8, ene: false },
-    teaching_pearl: "More than 4 positive nodes → pN2 in HPV+ OP path staging.",
-  },
-  {
-    id: "OPHPV-010",
-    site_group: "oropharynx",
-    subsite: "base_of_tongue",
-    stem: { age: 55, sex: "male", risk: "none", symptom: "muffled voice", laterality: "right" },
-    tumor: { size_cm: 4.7, advanced_local_extension: false },
-    nodes: { positive_node_count: 2, laterality: "ipsilateral", largest_node_cm: 3.2, ene: true },
-    teaching_pearl: "Large primary size and nodal burden both contribute to overall stage grouping.",
-  },
-  {
-    id: "OPHPV-011",
-    site_group: "oropharynx",
-    subsite: "base_of_tongue",
-    stem: { age: 44, sex: "male", risk: "none", symptom: "neck mass", laterality: "right" },
-    tumor: { size_cm: 1.6, advanced_local_extension: false },
-    nodes: { positive_node_count: 4, laterality: "ipsilateral", largest_node_cm: 5.0, ene: false },
-    teaching_pearl: "Node size is not used for HPV+ pN (path); node count is the driver.",
-  },
-  {
-    id: "OPHPV-012",
-    site_group: "oropharynx",
-    subsite: "base_of_tongue",
-    stem: { age: 59, sex: "female", risk: "none", symptom: "otalgia", laterality: "left" },
-    tumor: { size_cm: 2.8, advanced_local_extension: true },
-    nodes: { positive_node_count: 2, laterality: "ipsilateral", largest_node_cm: 2.7, ene: false },
-    teaching_pearl: "Referred otalgia can be a key symptom for oropharyngeal malignancy.",
-  },
-  {
-    id: "OPHPV-013",
-    site_group: "oropharynx",
-    subsite: "base_of_tongue",
-    stem: { age: 50, sex: "male", risk: "etoh", symptom: "dysphagia", laterality: "midline" },
-    tumor: { size_cm: 2.2, advanced_local_extension: false },
-    nodes: { positive_node_count: 1, laterality: "contralateral", largest_node_cm: 2.9, ene: false },
-    teaching_pearl: "Keep laterality for teaching; pN is determined by node count in HPV+ path staging.",
-  },
-  {
-    id: "OPHPV-014",
-    site_group: "oropharynx",
-    subsite: "base_of_tongue",
-    stem: { age: 62, sex: "female", risk: "none", symptom: "dysphagia", laterality: "left" },
-    tumor: { size_cm: 4.6, advanced_local_extension: true },
-    nodes: { positive_node_count: 2, laterality: "ipsilateral", largest_node_cm: 3.1, ene: false },
-    teaching_pearl: "Extension flags can bump T category even when nodal disease is limited.",
-  },
+export interface OropharynxHPVPosCase {
+  readonly id: string;
+  readonly site_group: "oropharynx_hpv_pos";
+  readonly subsite: "tonsil" | "base_of_tongue" | "soft_palate" | "pharyngeal_wall" | "unknown_primary";
+  readonly prompt: string;
+  readonly tumor: OropharynxHPVPosTumorInput;
+  readonly nodes: OropharynxHPVPosNodesInput;
+  readonly teaching_pearl: string;
+}
 
-  // -------------------------
-  // Soft palate
-  // -------------------------
+// AJCC Version 9 clinical cases. All are M0. Nodal counts add realism but do
+// not drive cN; side, size, and unequivocal imaging ENE do.
+export const oropharynxHPVPosCases: readonly OropharynxHPVPosCase[] = [
   {
-    id: "OPHPV-015",
-    site_group: "oropharynx",
-    subsite: "soft_palate",
-    stem: { age: 58, sex: "female", risk: "none", symptom: "globus sensation", laterality: "right" },
-    tumor: { size_cm: 4.2, advanced_local_extension: true },
-    nodes: { positive_node_count: 2, laterality: "ipsilateral", largest_node_cm: 2.9, ene: false },
-    teaching_pearl: "Advanced local extension suggests higher T category in HPV+ OP.",
+    id: "OPHPV9-001", site_group: "oropharynx_hpv_pos", subsite: "tonsil",
+    prompt: "A 52-year-old man has a 1.8 cm right tonsil HPV-associated squamous cell carcinoma. Examination and contrast CT show no involved regional nodes.",
+    tumor: { size_cm: 1.8 }, nodes: { positive_node_count: 0, laterality: "none", largest_node_cm: 0, unequivocal_imaging_ene: false },
+    teaching_pearl: "T1 because the primary is ≤2 cm; cN0 because no node is clinically or radiographically involved. T1N0M0 is clinical stage I.",
   },
   {
-    id: "OPHPV-016",
-    site_group: "oropharynx",
-    subsite: "soft_palate",
-    stem: { age: 53, sex: "male", risk: "none", symptom: "snoring change", laterality: "midline" },
-    tumor: { size_cm: 1.9, advanced_local_extension: false },
-    nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.2, ene: false },
-    teaching_pearl: "Small soft palate tumors may be missed on a cursory oral cavity exam.",
+    id: "OPHPV9-002", site_group: "oropharynx_hpv_pos", subsite: "base_of_tongue",
+    prompt: "MRI shows a 2.0 cm HPV-associated left base-of-tongue primary and one ipsilateral level II node measuring 6.0 cm without unequivocal imaging extranodal extension.",
+    tumor: { size_cm: 2.0 }, nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 6.0, unequivocal_imaging_ene: false },
+    teaching_pearl: "Exactly 2.0 cm remains T1, and an ipsilateral node exactly 6.0 cm without iENE remains cN1. The tempting N3 answer requires a node >6 cm.",
   },
   {
-    id: "OPHPV-017",
-    site_group: "oropharynx",
-    subsite: "soft_palate",
-    stem: { age: 66, sex: "male", risk: "both", symptom: "bleeding from mouth", laterality: "right" },
-    tumor: { size_cm: 3.9, advanced_local_extension: false },
-    nodes: { positive_node_count: 5, laterality: "bilateral", largest_node_cm: 3.1, ene: false },
-    teaching_pearl: "Node count >4 → pN2 regardless of laterality in HPV+ OP path staging.",
+    id: "OPHPV9-003", site_group: "oropharynx_hpv_pos", subsite: "tonsil",
+    prompt: "A 3.1 cm left tonsil HPV-associated carcinoma has three ipsilateral nodes, the largest 4.2 cm. Their capsules and surrounding fat planes remain intact on MRI.",
+    tumor: { size_cm: 3.1 }, nodes: { positive_node_count: 3, laterality: "ipsilateral", largest_node_cm: 4.2, unequivocal_imaging_ene: false },
+    teaching_pearl: "T2 is >2 to ≤4 cm. Multiple ipsilateral nodes do not increase clinical N by count: all are ≤6 cm and iENE-negative, so cN1 and stage I.",
   },
   {
-    id: "OPHPV-018",
-    site_group: "oropharynx",
-    subsite: "soft_palate",
-    stem: { age: 51, sex: "female", risk: "none", symptom: "voice change", laterality: "midline" },
-    tumor: { size_cm: 2.1, advanced_local_extension: false },
-    nodes: { positive_node_count: 3, laterality: "contralateral", largest_node_cm: 2.8, ene: false },
-    teaching_pearl: "Contralateral nodes can occur; pN remains count-based in HPV+ path staging.",
+    id: "OPHPV9-004", site_group: "oropharynx_hpv_pos", subsite: "base_of_tongue",
+    prompt: "Endoscopy and MRI show a 3.8 cm midline base-of-tongue HPV-associated carcinoma with bilateral cervical nodes, none larger than 3.4 cm and none with imaging ENE.",
+    tumor: { size_cm: 3.8 }, nodes: { positive_node_count: 4, laterality: "bilateral", largest_node_cm: 3.4, unequivocal_imaging_ene: false },
+    teaching_pearl: "Bilateral nodes ≤6 cm without iENE are cN2. T2N2M0 is clinical stage II; node count is not a clinical N criterion.",
   },
+  {
+    id: "OPHPV9-005", site_group: "oropharynx_hpv_pos", subsite: "tonsil",
+    prompt: "A 1.6 cm right tonsil HPV-associated carcinoma has a 2.8 cm ipsilateral level II node. MRI unequivocally shows tumor extending through the nodal capsule into perinodal fat.",
+    tumor: { size_cm: 1.6 }, nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.8, unequivocal_imaging_ene: true },
+    teaching_pearl: "Version 9 upstages ipsilateral nodal disease ≤6 cm from cN1 to cN2 when iENE is unequivocal. T1N2M0 is stage II.",
+  },
+  {
+    id: "OPHPV9-006", site_group: "oropharynx_hpv_pos", subsite: "tonsil",
+    prompt: "A 2.5 cm left tonsil HPV-associated carcinoma has bilateral nodes up to 3.0 cm. One right level II node unequivocally invades adjacent sternocleidomastoid on MRI.",
+    tumor: { size_cm: 2.5 }, nodes: { positive_node_count: 3, laterality: "bilateral", largest_node_cm: 3.0, unequivocal_imaging_ene: true },
+    teaching_pearl: "Bilateral nodes with unequivocal iENE are cN3 in Version 9, not cN2. Any cN3 M0 disease is clinical stage III.",
+  },
+  {
+    id: "OPHPV9-007", site_group: "oropharynx_hpv_pos", subsite: "base_of_tongue",
+    prompt: "A 4.0 cm HPV-associated base-of-tongue primary has a single 2.2 cm ipsilateral node without iENE.",
+    tumor: { size_cm: 4.0 }, nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.2, unequivocal_imaging_ene: false },
+    teaching_pearl: "Exactly 4.0 cm remains T2; T3 begins above 4 cm unless there is lingual epiglottic extension. Ipsilateral iENE-negative disease is cN1, so stage I.",
+  },
+  {
+    id: "OPHPV9-008", site_group: "oropharynx_hpv_pos", subsite: "base_of_tongue",
+    prompt: "A 2.7 cm HPV-associated base-of-tongue tumor extends mucosally onto the lingual surface of the epiglottis without invasion of the pre-epiglottic space or laryngeal framework. The neck is cN0.",
+    tumor: { size_cm: 2.7, extends_to_lingual_epiglottis: true }, nodes: { positive_node_count: 0, laterality: "none", largest_node_cm: 0, unequivocal_imaging_ene: false },
+    teaching_pearl: "Lingual-surface epiglottic extension makes this T3, but mucosal extension alone is not laryngeal invasion/T4. T3N0M0 is stage II.",
+  },
+  {
+    id: "OPHPV9-009", site_group: "oropharynx_hpv_pos", subsite: "tonsil",
+    prompt: "A 4.1 cm HPV-associated tonsil carcinoma has no advanced local invasion and no regional nodal disease.",
+    tumor: { size_cm: 4.1 }, nodes: { positive_node_count: 0, laterality: "none", largest_node_cm: 0, unequivocal_imaging_ene: false },
+    teaching_pearl: "A primary just over 4 cm is T3. With N0 and M0, the overall clinical stage is II.",
+  },
+  {
+    id: "OPHPV9-010", site_group: "oropharynx_hpv_pos", subsite: "tonsil",
+    prompt: "A 1.9 cm HPV-associated tonsil primary invades the medial pterygoid muscle on MRI. There is one 2.0 cm ipsilateral node without iENE.",
+    tumor: { size_cm: 1.9, t4_structures: ["medial_pterygoid"] }, nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.0, unequivocal_imaging_ene: false },
+    teaching_pearl: "Medial pterygoid invasion makes the tumor T4 regardless of size. Any T4 M0 HPV-associated oropharyngeal cancer is clinical stage III.",
+  },
+  {
+    id: "OPHPV9-011", site_group: "oropharynx_hpv_pos", subsite: "base_of_tongue",
+    prompt: "A 3.4 cm HPV-associated base-of-tongue primary invades the intrinsic tongue musculature but not the deep extrinsic muscles. One ipsilateral 3.2 cm node has no iENE.",
+    tumor: { size_cm: 3.4 }, nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 3.2, unequivocal_imaging_ene: false },
+    teaching_pearl: "Intrinsic tongue muscle involvement is not the T4 discriminator; deep extrinsic muscle invasion is. Size therefore controls T2, with cN1 and stage I.",
+  },
+  {
+    id: "OPHPV9-012", site_group: "oropharynx_hpv_pos", subsite: "tonsil",
+    prompt: "A 2.2 cm right tonsil HPV-associated primary has a single contralateral level II node measuring 2.5 cm without iENE.",
+    tumor: { size_cm: 2.2 }, nodes: { positive_node_count: 1, laterality: "contralateral", largest_node_cm: 2.5, unequivocal_imaging_ene: false },
+    teaching_pearl: "Contralateral cervical nodal disease is cN2 when ≤6 cm and iENE-negative. T2N2M0 is stage II.",
+  },
+  {
+    id: "OPHPV9-013", site_group: "oropharynx_hpv_pos", subsite: "tonsil",
+    prompt: "A 1.4 cm left tonsil HPV-associated carcinoma has an ipsilateral nodal conglomerate formed by two coalescent nodes with lost intervening tissue planes. The mass is 4.8 cm.",
+    tumor: { size_cm: 1.4 }, nodes: { positive_node_count: 2, laterality: "ipsilateral", largest_node_cm: 4.8, unequivocal_imaging_ene: true },
+    teaching_pearl: "A coalescent, indivisible nodal mass with loss of intervening capsules is unequivocal iENE. Ipsilateral iENE-positive nodes ≤6 cm are cN2, not N1.",
+  },
+  {
+    id: "OPHPV9-014", site_group: "oropharynx_hpv_pos", subsite: "tonsil",
+    prompt: "A 2.0 cm right tonsil HPV-associated carcinoma has a 6.1 cm ipsilateral node. No imaging ENE is present.",
+    tumor: { size_cm: 2.0 }, nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 6.1, unequivocal_imaging_ene: false },
+    teaching_pearl: "A node >6 cm is cN3 even without iENE. T1N3M0 is clinical stage III.",
+  },
+  {
+    id: "OPHPV9-015", site_group: "oropharynx_hpv_pos", subsite: "unknown_primary",
+    prompt: "No mucosal primary is found after examination, imaging, and directed endoscopy. Biopsy of a 3.0 cm ipsilateral level II node shows HPV-associated squamous cell carcinoma; imaging shows no ENE.",
+    tumor: { size_cm: 0, primary_unknown: true }, nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 3.0, unequivocal_imaging_ene: false },
+    teaching_pearl: "HPV-associated nodal disease with no identified oropharyngeal primary is T0. Ipsilateral disease ≤6 cm without iENE is cN1, giving clinical stage I.",
+  },
+  {
+    id: "OPHPV9-016", site_group: "oropharynx_hpv_pos", subsite: "tonsil",
+    prompt: "A 3.0 cm HPV-associated tonsil carcinoma has an ipsilateral 3.6 cm node with blurred margins and mild surrounding fat stranding, but the radiologist states ENE is equivocal rather than unequivocal.",
+    tumor: { size_cm: 3.0 }, nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 3.6, unequivocal_imaging_ene: false },
+    teaching_pearl: "Version 9 requires unequivocal imaging ENE. Equivocal stranding is staged to the lower category: cN1, not cN2; T2N1M0 remains stage I.",
+  },
+  {
+    id: "OPHPV9-017", site_group: "oropharynx_hpv_pos", subsite: "tonsil",
+    prompt: "A 3.9 cm HPV-associated tonsil carcinoma invades the mandible on MRI. Bilateral nodes measure up to 4.0 cm without iENE.",
+    tumor: { size_cm: 3.9, t4_structures: ["mandible"] }, nodes: { positive_node_count: 3, laterality: "bilateral", largest_node_cm: 4.0, unequivocal_imaging_ene: false },
+    teaching_pearl: "Mandibular invasion establishes T4. Bilateral nodes without iENE are cN2, but T4 makes the M0 clinical stage III.",
+  },
+  {
+    id: "OPHPV9-018", site_group: "oropharynx_hpv_pos", subsite: "tonsil",
+    prompt: "A 2.6 cm right tonsil HPV-associated carcinoma has bilateral nodes up to 5.9 cm without unequivocal iENE.",
+    tumor: { size_cm: 2.6 }, nodes: { positive_node_count: 6, laterality: "bilateral", largest_node_cm: 5.9, unequivocal_imaging_ene: false },
+    teaching_pearl: "Six involved nodes do not create a pathologic node-count category in this clinical module. Bilateral, ≤6 cm, iENE-negative disease is cN2; T2N2M0 is stage II.",
+  },
+];
 
-  // -------------------------
-  // Pharyngeal wall
-  // -------------------------
-  {
-    id: "OPHPV-019",
-    site_group: "oropharynx",
-    subsite: "pharyngeal_wall",
-    stem: { age: 57, sex: "female", risk: "none", symptom: "odynophagia", laterality: "left" },
-    tumor: { size_cm: 2.7, advanced_local_extension: false },
-    nodes: { positive_node_count: 2, laterality: "ipsilateral", largest_node_cm: 2.6, ene: false },
-    teaching_pearl: "Posterior pharyngeal wall lesions are easier to appreciate on flexible laryngoscopy.",
-  },
-  {
-    id: "OPHPV-020",
-    site_group: "oropharynx",
-    subsite: "pharyngeal_wall",
-    stem: { age: 48, sex: "male", risk: "none", symptom: "neck mass", laterality: "right" },
-    tumor: { size_cm: 1.5, advanced_local_extension: false },
-    nodes: { positive_node_count: 4, laterality: "bilateral", largest_node_cm: 3.7, ene: false },
-    teaching_pearl: "Bilateral nodes can still be pN1 if the positive node count is 4 or fewer (HPV+ path).",
-  },
-  {
-    id: "OPHPV-021",
-    site_group: "oropharynx",
-    subsite: "pharyngeal_wall",
-    stem: { age: 64, sex: "male", risk: "etoh", symptom: "weight loss", laterality: "midline" },
-    tumor: { size_cm: 4.9, advanced_local_extension: true },
-    nodes: { positive_node_count: 6, laterality: "bilateral", largest_node_cm: 4.4, ene: true },
-    teaching_pearl: "High tumor burden + >4 nodes is a classic high-stage pattern in HPV+ OP.",
-  },
-  {
-    id: "OPHPV-022",
-    site_group: "oropharynx",
-    subsite: "pharyngeal_wall",
-    stem: { age: 46, sex: "male", risk: "none", symptom: "sore throat", laterality: "right" },
-    tumor: { size_cm: 3.3, advanced_local_extension: false },
-    nodes: { positive_node_count: 0, laterality: "unknown", largest_node_cm: 0, ene: false },
-    teaching_pearl: "Keep node laterality as 'unknown' (or omit) when positive_node_count is 0.",
-  },
-
-  // -------------------------
-  // Additional variety
-  // -------------------------
-  {
-    id: "OPHPV-023",
-    site_group: "oropharynx",
-    subsite: "unknown",
-    stem: { age: 43, sex: "male", risk: "none", symptom: "neck mass", laterality: "left" },
-    tumor: { size_cm: 0.9, advanced_local_extension: false },
-    nodes: { positive_node_count: 2, laterality: "ipsilateral", largest_node_cm: 4.6, ene: false },
-    teaching_pearl: "Very small primaries can present with bulky cystic nodes in HPV+ disease.",
-  },
-  {
-    id: "OPHPV-024",
-    site_group: "oropharynx",
-    subsite: "base_of_tongue",
-    stem: { age: 56, sex: "female", risk: "none", symptom: "dysphagia", laterality: "right" },
-    tumor: { size_cm: 3.0, advanced_local_extension: false },
-    nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.5, ene: false },
-    teaching_pearl: "Low node count keeps pN in the lower categories for HPV+ OP path staging.",
-  },
-  {
-    id: "OPHPV-025",
-    site_group: "oropharynx",
-    subsite: "tonsil",
-    stem: { age: 52, sex: "male", risk: "both", symptom: "odynophagia", laterality: "right" },
-    tumor: { size_cm: 2.2, advanced_local_extension: true },
-    nodes: { positive_node_count: 4, laterality: "ipsilateral", largest_node_cm: 3.9, ene: true },
-    teaching_pearl: "Keep T logic (extension) separate from pN logic (node count) for HPV+ OP.",
-  },
-
-  // -------------------------
-  // unknown_primary (T0)
-  // -------------------------
-  {
-    id: "OPHPV-026",
-    site_group: "oropharynx",
-    subsite: "unknown_primary",
-    stem: { age: 51, sex: "male", risk: "none", symptom: "painless neck mass", laterality: "unspecified" },
-    tumor: { size_cm: 0, advanced_local_extension: false, primary_unknown: true },
-    nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 3.5, ene: false },
-    teaching_pearl: "HPV+ SCCUP is staged as T0 when no mucosal primary is identified.",
-  },
-  {
-    id: "OPHPV-027",
-    site_group: "oropharynx",
-    subsite: "unknown_primary",
-    stem: { age: 45, sex: "male", risk: "none", symptom: "rapidly enlarging neck mass", laterality: "unspecified" },
-    tumor: { size_cm: 0, advanced_local_extension: false, primary_unknown: true },
-    nodes: { positive_node_count: 4, laterality: "ipsilateral", largest_node_cm: 4.8, ene: false },
-    teaching_pearl: "Occult primaries can still have extensive nodal disease despite negative mucosal biopsies.",
-  },
-  {
-    id: "OPHPV-028",
-    site_group: "oropharynx",
-    subsite: "unknown_primary",
-    stem: { age: 60, sex: "male", risk: "etoh", symptom: "bilateral neck masses", laterality: "bilateral" },
-    tumor: { size_cm: 0, advanced_local_extension: false, primary_unknown: true },
-    nodes: { positive_node_count: 6, laterality: "bilateral", largest_node_cm: 3.9, ene: false },
-    teaching_pearl: "SCCUP with >4 positive nodes is pN2 in HPV+ OP path staging.",
-  },
-  {
-    id: "OPHPV-029",
-    site_group: "oropharynx",
-    subsite: "unknown_primary",
-    stem: { age: 42, sex: "male", risk: "none", symptom: "neck mass after URI", laterality: "unspecified" },
-    tumor: { size_cm: 0, advanced_local_extension: false, primary_unknown: true },
-    nodes: { positive_node_count: 2, laterality: "ipsilateral", largest_node_cm: 3.0, ene: true },
-    teaching_pearl: "ENE can be present in SCCUP; HPV+ path pN still uses node count thresholds.",
-  },
-  {
-    id: "OPHPV-030",
-    site_group: "oropharynx",
-    subsite: "unknown_primary",
-    stem: { age: 57, sex: "female", risk: "none", symptom: "neck mass", laterality: "unspecified" },
-    tumor: { size_cm: 0, advanced_local_extension: false, primary_unknown: true },
-    nodes: { positive_node_count: 1, laterality: "contralateral", largest_node_cm: 2.7, ene: false },
-    teaching_pearl: "Contralateral nodal disease can still occur with an occult HPV+ oropharyngeal primary.",
-  },
-  {
-    id: "OPHPV-031",
-    site_group: "oropharynx",
-    subsite: "unknown_primary",
-    stem: { age: 65, sex: "male", risk: "both", symptom: "neck mass with otalgia", laterality: "unspecified" },
-    tumor: { size_cm: 0, advanced_local_extension: false, primary_unknown: true },
-    nodes: { positive_node_count: 3, laterality: "bilateral", largest_node_cm: 4.2, ene: false },
-    teaching_pearl: "Bilateral nodes can still be pN1 if positive node count is ≤4 (HPV+ path).",
-  },
-  {
-    id: "OPHPV-032",
-    site_group: "oropharynx",
-    subsite: "unknown_primary",
-    stem: { age: 50, sex: "male", risk: "none", symptom: "cystic neck mass", laterality: "unspecified" },
-    tumor: { size_cm: 0, advanced_local_extension: false, primary_unknown: true },
-    nodes: { positive_node_count: 4, laterality: "ipsilateral", largest_node_cm: 5.5, ene: false },
-    teaching_pearl: "Cystic level II nodes are a common clue for HPV+ oropharyngeal origin.",
-  },
-] as const;

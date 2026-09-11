@@ -7,6 +7,7 @@ type TumorInputs = {
   bone_invasion: boolean;
   extrinsic_muscle_involved: boolean;
   skin_invasion: boolean;
+  masticator_space_invasion?: boolean;
 };
 
 type NodeInputs = {
@@ -74,7 +75,7 @@ const acceptanceCases: Array<{
     id: "AT-OT-009",
     tumor: { size_cm: 3.0, doi_mm: 9, bone_invasion: false, extrinsic_muscle_involved: true, skin_invasion: false },
     nodes: { node_count: 0, laterality: "none", largest_node_cm: 0.0, ene: false },
-    expected: { T: "T4a", N: "N0", stage: "IVA" },
+    expected: { T: "T2", N: "N0", stage: "II" },
   },
   {
     id: "AT-OT-010",
@@ -82,14 +83,38 @@ const acceptanceCases: Array<{
     nodes: { node_count: 2, laterality: "bilateral", largest_node_cm: 2.5, ene: false },
     expected: { T: "T3", N: "N2c", stage: "IVA" },
   },
+  {
+    id: "AT-OT-011",
+    tumor: { size_cm: 4.1, doi_mm: 10.1, bone_invasion: false, extrinsic_muscle_involved: false, skin_invasion: false },
+    nodes: { node_count: 0, laterality: "none", largest_node_cm: 0, ene: false },
+    expected: { T: "T4a", N: "N0", stage: "IVA" },
+  },
+  {
+    id: "AT-OT-012",
+    tumor: { size_cm: 2.5, doi_mm: 7, bone_invasion: false, extrinsic_muscle_involved: false, skin_invasion: false, masticator_space_invasion: true },
+    nodes: { node_count: 0, laterality: "none", largest_node_cm: 0, ene: false },
+    expected: { T: "T4b", N: "N0", stage: "IVB" },
+  },
+  {
+    id: "AT-OT-013",
+    tumor: { size_cm: 2, doi_mm: 5, bone_invasion: false, extrinsic_muscle_involved: false, skin_invasion: false },
+    nodes: { node_count: 1, laterality: "ipsilateral", largest_node_cm: 3, ene: true },
+    expected: { T: "T1", N: "N2a", stage: "IVA" },
+  },
+  {
+    id: "AT-OT-014",
+    tumor: { size_cm: 2, doi_mm: 5, bone_invasion: false, extrinsic_muscle_involved: false, skin_invasion: false },
+    nodes: { node_count: 2, laterality: "bilateral", largest_node_cm: 6.1, ene: false },
+    expected: { T: "T1", N: "N3a", stage: "IVB" },
+  },
 ];
 
 describe("AJCC8 oral cavity (oral tongue) acceptance tests", () => {
   for (const c of acceptanceCases) {
     it(c.id, () => {
-      const T = computeT(c.tumor as any);
-      const N = computeN(c.nodes as any);
-      const stage = computeStageGroup(T as any, N as any);
+      const T = computeT(c.tumor);
+      const N = computeN(c.nodes);
+      const stage = computeStageGroup(T, N);
 
       expect(T).toBe(c.expected.T);
       expect(N).toBe(c.expected.N);

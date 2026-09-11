@@ -51,7 +51,7 @@ export interface MaxillarySinusTumor {
   clivus?: boolean;
 }
 
-export interface MaxillarySinusNodes extends HeadNeckNodes {}
+export type MaxillarySinusNodes = HeadNeckNodes;
 
 export function computeT_MaxillarySinus(t: MaxillarySinusTumor): MaxillarySinusT {
   // T4b overrides everything

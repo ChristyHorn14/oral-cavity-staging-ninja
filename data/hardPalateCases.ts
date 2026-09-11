@@ -136,7 +136,7 @@ export const hardPalateCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Single ipsilateral node 3–6 cm without ENE is N2a across oral cavity subsites.",
+      "Single ipsilateral node 3–6 cm without clinically overt ENE is N2a across oral cavity subsites.",
   },
   {
     id: "hp-007",
@@ -235,7 +235,7 @@ export const hardPalateCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Bilateral nodes ≤6 cm without ENE correspond to N2c regardless of oral cavity subsite.",
+      "Bilateral nodes ≤6 cm without clinically overt ENE correspond to N2c regardless of oral cavity subsite.",
   },
   {
     id: "hp-011",
@@ -261,7 +261,7 @@ export const hardPalateCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Contralateral nodal disease ≤6 cm without ENE is staged N2c.",
+      "Contralateral nodal disease ≤6 cm without clinically overt ENE is staged N2c.",
   },
   {
     id: "hp-012",
@@ -287,7 +287,7 @@ export const hardPalateCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "A node >6 cm but without ENE pushes nodal staging to N3a.",
+      "A node >6 cm but without clinically overt ENE pushes nodal staging to N3a.",
   },
   {
     id: "hp-013",
@@ -313,7 +313,7 @@ export const hardPalateCases: OralCavityCase[] = [
       ene: true,
     },
     teaching_pearl:
-      "Any ENE-positive node is N3b in this simplified oral cavity nodal logic.",
+      "Clinically overt ENE in multiple ipsilateral nodes is cN3b; a single ipsilateral node ≤3 cm with ENE would instead be cN2a.",
   },
   {
     id: "hp-014",
@@ -360,6 +360,6 @@ export const hardPalateCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Large T3 lesions on the hard palate can still be node-negative; stage group hinges on nodal status.",
+      "Size >4 cm together with DOI >10 mm makes this T4a, even without an anatomic invasion feature; cN0 disease groups as stage IVA.",
   },
 ];

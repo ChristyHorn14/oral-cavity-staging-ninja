@@ -1,7 +1,7 @@
 // data/hypopharynxCases.ts
 //
 // Final intended filename.
-// 30 MVP cases to validate computeT_Hypopharynx() before deployment.
+// Clinical cases used to validate computeT_Hypopharynx().
 // Prompts are deliberately non-leading: they describe the scenario without hinting the T rule.
 
 import type { HypopharynxTInputs, HypopharynxT } from "@/lib/staging/hypopharynxStage";
@@ -251,7 +251,7 @@ export const hypopharynxCases: HypopharynxCase[] = [
       max_dimension_cm: 2.0,
       limited_to_one_subsite: true,
       multiple_hypopharynx_subsites: false,
-      adjacent_site_involvement: "cervical_esophagus",
+      adjacent_site_involvement: "none",
       vocal_cord_mobility: "unknown",
       extends_to_esophagus: true,
       cartilage_invasion: "none",
@@ -275,7 +275,7 @@ export const hypopharynxCases: HypopharynxCase[] = [
       max_dimension_cm: 1.8,
       limited_to_one_subsite: true,
       multiple_hypopharynx_subsites: false,
-      adjacent_site_involvement: "cervical_esophagus",
+      adjacent_site_involvement: "none",
       vocal_cord_mobility: "unknown",
       extends_to_esophagus: false,
       cartilage_invasion: "none",
@@ -284,8 +284,8 @@ export const hypopharynxCases: HypopharynxCase[] = [
       soft_tissue_neck_invasion: false,
       unresectable_feature: "none",
     },
-    expectedT: "T2",
-    teaching_pearl: "Here, esophagus extension must be explicit to trigger the T3 rule.",
+    expectedT: "T1",
+    teaching_pearl: "Proximity without definite invasion is not esophageal extension. At 1.8 cm and limited to one subsite, this remains T1—not T3.",
     nodes: { positive_node_count: 2, laterality: "bilateral", largest_node_cm: 3.4, ene: false },
   },
   {
@@ -480,48 +480,6 @@ export const hypopharynxCases: HypopharynxCase[] = [
     expectedT: "Tis",
     teaching_pearl: "In situ disease is Tis (when assessable).",
     nodes: { positive_node_count: 0, laterality: "none", largest_node_cm: 0, ene: false },
-  },
-  {
-    site_group: "hypopharynx",
-    subsite: "posterior_pharyngeal_wall",
-    id: "hypo-020",
-    prompt:
-      "Patient referred for suspected hypopharyngeal malignancy, but endoscopy and imaging do not identify a primary tumor.",
-    tumor: {
-      primary_tumor_assessable: true,
-      no_primary_tumor_identified: true,
-      max_dimension_cm: 0,
-      limited_to_one_subsite: false,
-      multiple_hypopharynx_subsites: false,
-      adjacent_site_involvement: "unknown",
-      vocal_cord_mobility: "unknown",
-      extends_to_esophagus: false,
-      cartilage_invasion: "unknown",
-      hyoid_invasion: false,
-      thyroid_gland_invasion: false,
-      soft_tissue_neck_invasion: false,
-      unresectable_feature: "unknown",
-    },
-    expectedT: "T0",
-    teaching_pearl: "If explicitly no primary tumor, use T0.",
-    nodes: { positive_node_count: 1, laterality: "unknown", largest_node_cm: 1.6, ene: false },
-  },
-  {
-    site_group: "hypopharynx",
-    subsite: "postcricoid",
-    id: "hypo-021",
-    prompt:
-      "Outside records insufficient to define the primary tumor; clinician documents that the primary cannot be assessed.",
-    tumor: {
-      primary_tumor_assessable: false,
-      max_dimension_cm: 0,
-      limited_to_one_subsite: false,
-      multiple_hypopharynx_subsites: false,
-    },
-    expectedT: "TX",
-    teaching_pearl:
-      "If you cannot assess the primary tumor, it is TX. When the primary tumor cannot be assessed (TX), overall stage grouping cannot be assigned.",
-    nodes: { positive_node_count: 2, laterality: "ipsilateral", largest_node_cm: 3.3, ene: false },
   },
   {
     site_group: "hypopharynx",

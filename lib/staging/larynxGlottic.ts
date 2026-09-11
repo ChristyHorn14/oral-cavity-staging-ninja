@@ -1,5 +1,5 @@
 // lib/staging/larynxGlottic.ts
-// AJCC 8 – Larynx (Glottic) – MVP
+// AJCC 8 – Larynx (Glottic) clinical staging
 // - Uses common HPV-negative H&N N staging + classic stage grouping
 // - Glottic-specific T staging is driven by mobility + extension + cartilage involvement
 // - Includes optional Stage 0 (Tis N0)
@@ -32,7 +32,7 @@ export interface LarynxGlotticTumor {
   extends_to_subglottis?: boolean;
 
   /**
-   * T3 feature independent of mobility (MVP field).
+   * T3 feature independent of mobility.
    */
   paraglottic_space_invasion?: boolean;
 
@@ -55,7 +55,7 @@ export interface LarynxGlotticTumor {
   in_situ?: boolean;
 }
 
-export interface LarynxGlotticNodes extends HeadNeckNodes {}
+export type LarynxGlotticNodes = HeadNeckNodes;
 
 export function computeT_LarynxGlottic(t: LarynxGlotticTumor): LarynxGlotticT {
   // Stage 0 support
@@ -79,7 +79,7 @@ export function computeT_LarynxGlottic(t: LarynxGlotticTumor): LarynxGlotticT {
     return "T2";
   }
 
-  // MVP: treat remaining as T1 (later you can split T1a/T1b)
+  // The app asks for the parent T1 category rather than the optional T1a/T1b subdivision.
   return "T1";
 }
 

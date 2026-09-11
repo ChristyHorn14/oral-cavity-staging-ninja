@@ -9,6 +9,7 @@ export interface HeadNeckNodes {
   positive_node_count: number;
   laterality?: "ipsilateral" | "contralateral" | "bilateral" | "none" | "unknown";
   largest_node_cm: number;
+  /** Clinically overt ENE, not microscopic/pathologic ENE. */
   ene: boolean;
 }
 
@@ -22,8 +23,11 @@ export function computeN_HeadNeckHPVNeg(n: HeadNeckNodes): HeadNeckN {
   // N0
   if (count === 0) return "N0";
 
-  // ENE+ => N3b (MVP simplification you already had)
-  if (ene) return "N3b";
+  if (ene) {
+    // A single ipsilateral node <=3 cm with clinically overt ENE is cN2a.
+    if (count === 1 && lat === "ipsilateral" && size <= 3) return "N2a";
+    return "N3b";
+  }
 
   // Size > 6 cm (ENE-) => N3a
   if (size > 6) return "N3a";
@@ -48,8 +52,8 @@ export function computeN_HeadNeckHPVNeg(n: HeadNeckNodes): HeadNeckN {
     return "N2b";
   }
 
-  // Unknown laterality: be conservative but not wrong-mostly
-  // If single small node, call it N1-ish; otherwise N2b-ish.
+  // Unknown laterality cannot distinguish the laterality-dependent categories.
+  // Callers should supply laterality; these fallbacks keep incomplete legacy data usable.
   if (count === 1 && size <= 3) return "N1";
   if (count === 1 && size <= 6) return "N2a";
   return "N2b";

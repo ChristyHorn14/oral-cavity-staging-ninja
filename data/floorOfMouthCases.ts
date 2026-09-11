@@ -41,7 +41,7 @@ export const floorOfMouthCases: OralTongueCase[] = [
     stem: { age: 60, sex: "M", risk: "tobacco", symptom: "mass", laterality: "right" },
     tumor: { size_cm: 3.6, doi_mm: 9, bone_invasion: false, extrinsic_muscle_involved: false, skin_invasion: false },
     nodes: { node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.4, ene: false },
-    teaching_pearl: "Single ipsilateral node ≤3 cm without ENE = N1, same as oral tongue.",
+    teaching_pearl: "Single ipsilateral node ≤3 cm without clinically overt ENE = N1, same as oral tongue.",
   },
   {
     id: "fom-006",
@@ -81,7 +81,7 @@ export const floorOfMouthCases: OralTongueCase[] = [
     stem: { age: 65, sex: "M", risk: "both", symptom: "mass", laterality: "right" },
     tumor: { size_cm: 2.7, doi_mm: 8, bone_invasion: false, extrinsic_muscle_involved: true, skin_invasion: false },
     nodes: { node_count: 0, laterality: "none", largest_node_cm: 0, ene: false },
-    teaching_pearl: "Extrinsic muscle involvement (e.g., genioglossus/geniohyoid) is also T4a.",
+    teaching_pearl: "Deep extrinsic tongue-muscle involvement is not an independent AJCC 8 oral-cavity T4 criterion. With size 2.7 cm and DOI 8 mm, this is T2.",
   },
   {
     id: "fom-011",
@@ -97,7 +97,7 @@ export const floorOfMouthCases: OralTongueCase[] = [
     stem: { age: 69, sex: "M", risk: "tobacco", symptom: "mass", laterality: "right" },
     tumor: { size_cm: 3.5, doi_mm: 13, bone_invasion: false, extrinsic_muscle_involved: false, skin_invasion: false },
     nodes: { node_count: 1, laterality: "ipsilateral", largest_node_cm: 3.5, ene: false },
-    teaching_pearl: "Single ipsilateral node 3–6 cm without ENE = N2a.",
+    teaching_pearl: "Single ipsilateral node 3–6 cm without clinically overt ENE = N2a.",
   },
   {
     id: "fom-013",
@@ -105,7 +105,7 @@ export const floorOfMouthCases: OralTongueCase[] = [
     stem: { age: 74, sex: "F", risk: "etoh", symptom: "ulcer", laterality: "midline" },
     tumor: { size_cm: 3.0, doi_mm: 10, bone_invasion: false, extrinsic_muscle_involved: false, skin_invasion: false },
     nodes: { node_count: 3, laterality: "ipsilateral", largest_node_cm: 2.8, ene: false },
-    teaching_pearl: "Multiple ipsilateral nodes without ENE (largest ≤6 cm) = N2b.",
+    teaching_pearl: "Multiple ipsilateral nodes without clinically overt ENE (largest ≤6 cm) = N2b.",
   },
   {
     id: "fom-014",
@@ -113,7 +113,7 @@ export const floorOfMouthCases: OralTongueCase[] = [
     stem: { age: 57, sex: "M", risk: "both", symptom: "pain", laterality: "right" },
     tumor: { size_cm: 2.0, doi_mm: 9, bone_invasion: false, extrinsic_muscle_involved: false, skin_invasion: false },
     nodes: { node_count: 1, laterality: "contralateral", largest_node_cm: 2.3, ene: false },
-    teaching_pearl: "Contralateral nodal disease without ENE = N2c.",
+    teaching_pearl: "Contralateral nodal disease without clinically overt ENE = N2c.",
   },
   {
     id: "fom-015",
@@ -129,7 +129,7 @@ export const floorOfMouthCases: OralTongueCase[] = [
     stem: { age: 71, sex: "M", risk: "tobacco", symptom: "mass", laterality: "midline" },
     tumor: { size_cm: 4.3, doi_mm: 15, bone_invasion: false, extrinsic_muscle_involved: false, skin_invasion: false },
     nodes: { node_count: 2, laterality: "bilateral", largest_node_cm: 3.4, ene: false },
-    teaching_pearl: "Advanced midline FOM tumor with bilateral nodes → typically staged IVA.",
+    teaching_pearl: "Size >4 cm together with DOI >10 mm makes the primary T4a; bilateral clinically ENE-negative nodes are cN2c, yielding stage IVA.",
   },
   {
     id: "fom-017",
@@ -137,7 +137,7 @@ export const floorOfMouthCases: OralTongueCase[] = [
     stem: { age: 66, sex: "F", risk: "etoh", symptom: "pain", laterality: "right" },
     tumor: { size_cm: 2.3, doi_mm: 6, bone_invasion: false, extrinsic_muscle_involved: false, skin_invasion: false },
     nodes: { node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.0, ene: true },
-    teaching_pearl: "Any ENE-positive node is N3b in this MVP staging logic.",
+    teaching_pearl: "A single ipsilateral node ≤3 cm with clinically overt ENE is cN2a, not cN3b.",
   },
   {
     id: "fom-018",
@@ -145,7 +145,7 @@ export const floorOfMouthCases: OralTongueCase[] = [
     stem: { age: 59, sex: "M", risk: "both", symptom: "mass", laterality: "left" },
     tumor: { size_cm: 3.9, doi_mm: 11, bone_invasion: false, extrinsic_muscle_involved: false, skin_invasion: false },
     nodes: { node_count: 1, laterality: "ipsilateral", largest_node_cm: 6.4, ene: false },
-    teaching_pearl: "Node >6 cm without ENE = N3a.",
+    teaching_pearl: "Node >6 cm without clinically overt ENE = N3a.",
   },
   {
     id: "fom-019",
@@ -161,6 +161,6 @@ export const floorOfMouthCases: OralTongueCase[] = [
     stem: { age: 69, sex: "M", risk: "tobacco", symptom: "mass", laterality: "right" },
     tumor: { size_cm: 4.8, doi_mm: 18, bone_invasion: false, extrinsic_muscle_involved: false, skin_invasion: false },
     nodes: { node_count: 3, laterality: "ipsilateral", largest_node_cm: 3.9, ene: true },
-    teaching_pearl: "Large T3 tumor with ENE+ ipsilateral nodes (N3b) → very advanced stage.",
+    teaching_pearl: "Size >4 cm together with DOI >10 mm makes this T4a; clinically overt ENE makes the nodes cN3b and the group stage IVB.",
   },
 ];

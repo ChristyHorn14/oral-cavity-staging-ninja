@@ -48,7 +48,7 @@ export const larynxGlotticCases: readonly LarynxGlotticCase[] = [
     stem: { age: 49, sex: "female", risk: "none", symptom: "hoarseness" },
     tumor: { vocal_cord_mobility: "normal" },
     nodes: { positive_node_count: 0, laterality: "none", largest_node_cm: 0, ene: false },
-    teaching_pearl: "Normal cord mobility with no extension is T1 in this MVP.",
+    teaching_pearl: "A glottic primary limited to the vocal cord(s) with normal mobility is in the T1 category.",
   },
   {
     site_group: "larynx",
@@ -118,7 +118,7 @@ export const larynxGlotticCases: readonly LarynxGlotticCase[] = [
     nodes: { positive_node_count: 0, laterality: "none", largest_node_cm: 0, ene: false },
     teaching_pearl: "Paraglottic space invasion is treated as T3 here even if mobility is not fixed.",
   },
-  // T2 N1 (single ipsi ≤3, ENE−) => Stage III
+  // T2 N1 (single ipsi ≤3, clinically overt ENE−) => Stage III
   {
     site_group: "larynx",
     subsite: "glottic",
@@ -156,7 +156,7 @@ export const larynxGlotticCases: readonly LarynxGlotticCase[] = [
     stem: { age: 66, sex: "female", risk: "tobacco", symptom: "hoarseness with neck mass" },
     tumor: { vocal_cord_mobility: "impaired" },
     nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 4.8, ene: false },
-    teaching_pearl: "Single ipsilateral node >3–6 cm (ENE−) is N2a → Stage IVA.",
+    teaching_pearl: "Single ipsilateral node >3–6 cm (clinically overt ENE−) is N2a → Stage IVA.",
   },
   // N2b multiple ipsilateral
   {
@@ -165,7 +165,7 @@ export const larynxGlotticCases: readonly LarynxGlotticCase[] = [
     stem: { age: 70, sex: "male", risk: "both", symptom: "hoarseness with neck swelling" },
     tumor: { vocal_cord_mobility: "impaired" },
     nodes: { positive_node_count: 3, laterality: "ipsilateral", largest_node_cm: 3.2, ene: false },
-    teaching_pearl: "Multiple ipsilateral nodes (ENE−, ≤6 cm) are N2b → Stage IVA.",
+    teaching_pearl: "Multiple ipsilateral nodes (clinically overt ENE−, ≤6 cm) are N2b → Stage IVA.",
   },
   // N2c contralateral
   {
@@ -174,7 +174,7 @@ export const larynxGlotticCases: readonly LarynxGlotticCase[] = [
     stem: { age: 57, sex: "male", risk: "tobacco", symptom: "hoarseness with contralateral neck node" },
     tumor: { vocal_cord_mobility: "normal" },
     nodes: { positive_node_count: 2, laterality: "contralateral", largest_node_cm: 2.6, ene: false },
-    teaching_pearl: "Contralateral/bilateral nodes (≤6 cm, ENE−) are N2c → Stage IVA.",
+    teaching_pearl: "Contralateral/bilateral nodes (≤6 cm, clinically overt ENE−) are N2c → Stage IVA.",
   },
   // N2c bilateral
   {
@@ -183,7 +183,7 @@ export const larynxGlotticCases: readonly LarynxGlotticCase[] = [
     stem: { age: 65, sex: "female", risk: "both", symptom: "hoarseness with bilateral neck nodes" },
     tumor: { vocal_cord_mobility: "impaired" },
     nodes: { positive_node_count: 2, laterality: "bilateral", largest_node_cm: 2.9, ene: false },
-    teaching_pearl: "Bilateral nodes (≤6 cm, ENE−) are N2c → Stage IVA.",
+    teaching_pearl: "Bilateral nodes (≤6 cm, clinically overt ENE−) are N2c → Stage IVA.",
   },
 
   // T4a features (cartilage through cortex / extralaryngeal)
@@ -215,14 +215,14 @@ export const larynxGlotticCases: readonly LarynxGlotticCase[] = [
   // -----------------------------
   // Stage IVB: T4b OR any N3
   // -----------------------------
-  // N3a (>6 cm, ENE−)
+  // N3a (>6 cm, clinically overt ENE−)
   {
     site_group: "larynx",
     subsite: "glottic",
     stem: { age: 59, sex: "male", risk: "both", symptom: "large neck mass with hoarseness" },
     tumor: { vocal_cord_mobility: "impaired" },
     nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 6.7, ene: false },
-    teaching_pearl: "Largest node >6 cm (ENE−) is N3a → Stage IVB regardless of T.",
+    teaching_pearl: "Largest node >6 cm (clinically overt ENE−) is N3a → Stage IVB regardless of T.",
   },
   // N3a with multiple nodes (still N3a by size)
   {
@@ -231,25 +231,25 @@ export const larynxGlotticCases: readonly LarynxGlotticCase[] = [
     stem: { age: 66, sex: "female", risk: "tobacco", symptom: "hoarseness with bulky nodal disease" },
     tumor: { vocal_cord_mobility: "normal" },
     nodes: { positive_node_count: 3, laterality: "ipsilateral", largest_node_cm: 7.2, ene: false },
-    teaching_pearl: "If the largest node is >6 cm and ENE−, it is N3a even with multiple nodes.",
+    teaching_pearl: "If the largest node is >6 cm and clinically overt ENE−, it is N3a even with multiple nodes.",
   },
-  // N3b (ENE+)
+  // cN2a: single ipsilateral node <=3 cm with clinically overt ENE
   {
     site_group: "larynx",
     subsite: "glottic",
     stem: { age: 62, sex: "female", risk: "tobacco", symptom: "hoarseness with enlarging neck mass" },
     tumor: { vocal_cord_mobility: "impaired" },
     nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.2, ene: true },
-    teaching_pearl: "ENE+ nodal disease is N3b → Stage IVB.",
+    teaching_pearl: "A single ipsilateral node ≤3 cm with clinically overt ENE is cN2a, producing stage IVA here—not cN3b/IVB.",
   },
-  // N3b bilateral ENE+
+  // N3b bilateral clinically overt ENE+
   {
     site_group: "larynx",
     subsite: "glottic",
     stem: { age: 71, sex: "male", risk: "both", symptom: "hoarseness with bilateral nodes" },
     tumor: { vocal_cord_mobility: "fixed" },
     nodes: { positive_node_count: 2, laterality: "bilateral", largest_node_cm: 3.1, ene: true },
-    teaching_pearl: "ENE+ overrides laterality/size: N3b, Stage IVB.",
+    teaching_pearl: "clinically overt ENE+ overrides laterality/size: N3b, Stage IVB.",
   },
 
   // T4b (very advanced extension) — Stage IVB even if N0
@@ -279,14 +279,14 @@ export const larynxGlotticCases: readonly LarynxGlotticCase[] = [
     nodes: { positive_node_count: 2, laterality: "bilateral", largest_node_cm: 3.0, ene: false },
     teaching_pearl: "T4b overrides N2 disease; stage is still IVB.",
   },
-  // T4b + ENE+ (still IVB)
+  // T4b + clinically overt ENE+ (still IVB)
   {
     site_group: "larynx",
     subsite: "glottic",
     stem: { age: 60, sex: "male", risk: "tobacco", symptom: "hoarseness with painful neck mass" },
     tumor: { vocal_cord_mobility: "impaired", very_advanced_extension: true },
     nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.0, ene: true },
-    teaching_pearl: "T4b and/or N3 leads to IVB; ENE+ specifically is N3b.",
+    teaching_pearl: "The primary is T4b and therefore stage IVB. The single 2.0 cm ipsilateral node with clinically overt ENE is cN2a, not cN3b.",
   },
 
   // -----------------------------
@@ -328,13 +328,13 @@ export const larynxGlotticCases: readonly LarynxGlotticCase[] = [
     nodes: { positive_node_count: 2, laterality: "bilateral", largest_node_cm: 3.4, ene: false },
     teaching_pearl: "T4a with N2 disease remains stage IVA; IVB requires T4b or N3.",
   },
-  // T2 + N3b (ENE+)
+  // T2 + cN2a (single ipsilateral node <=3 cm with clinically overt ENE)
   {
     site_group: "larynx",
     subsite: "glottic",
     stem: { age: 63, sex: "male", risk: "both", symptom: "hoarseness with tender node" },
     tumor: { vocal_cord_mobility: "impaired" },
     nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.6, ene: true },
-    teaching_pearl: "ENE+ makes N3b (Stage IVB) regardless of T category.",
+    teaching_pearl: "A single ipsilateral node ≤3 cm with clinically overt ENE is cN2a; T2N2aM0 is stage IVA.",
   },
 ] as const;

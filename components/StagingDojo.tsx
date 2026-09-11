@@ -1,9 +1,12 @@
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/static-components */
+
 import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 
 import CaseCountLine from "@/components/CaseCountLine";
+import { moduleMetadata, stagingSystemLabel, type CasePool, type ModuleId } from "@/lib/modules";
 
 // ---- Oral cavity ----
 import { oralTongueCases } from "@/data/oralTongueCases";
@@ -18,10 +21,18 @@ import { OralCavityCase } from "@/lib/staging/types";
 // ---- Oropharynx HPV+ ----
 import { oropharynxHPVPosCases } from "@/data/oropharynxHPVPosCases";
 import {
-  computeT_OropharynxHPVPos_Path,
-  computeN_OropharynxHPVPos_Path,
-  computeStageGroup_OropharynxHPVPos_Path,
-} from "@/lib/staging/oropharynxHPVPosPath";
+  computeT_OropharynxHPVPos,
+  computeN_OropharynxHPVPos,
+  computeStageGroup_OropharynxHPVPos,
+} from "@/lib/staging/oropharynxHPVPos";
+
+// ---- Nasopharynx ----
+import { nasopharynxCases } from "@/data/nasopharynxCases";
+import {
+  computeT_Nasopharynx,
+  computeN_Nasopharynx,
+  computeStageGroup_Nasopharynx,
+} from "@/lib/staging/nasopharynx";
 
 // ---- Oropharynx HPV− ----
 import { oropharynxHPVNegCases } from "@/data/oropharynxHPVNegCases";
@@ -50,6 +61,22 @@ import { computeT_LarynxSubglottic } from "@/lib/staging/larynxSubglotticStage";
 // ---- Hypopharynx ----
 import { hypopharynxCases } from "@/data/hypopharynxCases";
 import { computeT_Hypopharynx } from "@/lib/staging/hypopharynxStage";
+
+// ---- Maxillary sinus ----
+import { maxillarySinusCases } from "@/data/maxillarySinusCases";
+import {
+  computeT_MaxillarySinus,
+  computeN_MaxillarySinus,
+  computeStageGroup_MaxillarySinus,
+} from "@/lib/staging/maxillarySinusStage";
+
+// ---- Differentiated thyroid ----
+import { differentiatedThyroidCases } from "@/data/differentiatedThyroidCases";
+import {
+  computeT_DifferentiatedThyroid,
+  computeN_DifferentiatedThyroid,
+  computeStageGroup_DifferentiatedThyroid,
+} from "@/lib/staging/differentiatedThyroidStage";
 
 function randIndex(n: number) {
   return Math.floor(Math.random() * n);
@@ -95,10 +122,13 @@ function normalizeT(t: any): string {
 }
 
 type OropharynxHPVPosCase = (typeof oropharynxHPVPosCases)[number];
+type NasopharynxCase = (typeof nasopharynxCases)[number];
 type OropharynxHPVNegCase = (typeof oropharynxHPVNegCases)[number];
 type LarynxGlotticCase = (typeof larynxGlotticCases)[number];
 type LarynxSupraglotticCase = (typeof larynxSupraglotticCases)[number];
 type HypopharynxCase = (typeof hypopharynxCases)[number];
+type MaxillarySinusCase = (typeof maxillarySinusCases)[number];
+type DifferentiatedThyroidCase = (typeof differentiatedThyroidCases)[number];
 
 // “inputs-shaped” subglottic case (from your de-keyed file)
 type SubglotticInputsCase = {
@@ -113,22 +143,15 @@ type SubglotticInputsCase = {
 type AnyCase =
   | OralCavityCase
   | OropharynxHPVPosCase
+  | NasopharynxCase
   | OropharynxHPVNegCase
   | LarynxGlotticCase
   | LarynxSupraglotticCase
   | HypopharynxCase
+  | MaxillarySinusCase
+  | DifferentiatedThyroidCase
   | SubglotticInputsCase
   | any;
-
-type CasePool =
-  | "oral_cavity"
-  | "oropharynx_hpv_pos"
-  | "oropharynx_hpv_neg"
-  | "larynx_glottic"
-  | "larynx_supraglottic"
-  | "larynx_subglottic"
-  | "hypopharynx"
-  | "mixed";
 
 // All oral cavity cases (all subsites)
 const oralCavityCases: OralCavityCase[] = [
@@ -145,10 +168,13 @@ const mixedCases: readonly AnyCase[] = [
   ...oralCavityCases,
   ...oropharynxHPVPosCases,
   ...oropharynxHPVNegCases,
+  ...nasopharynxCases,
   ...larynxGlotticCases,
   ...larynxSupraglotticCases,
   ...larynxSubglotticCases,
   ...hypopharynxCases,
+  ...maxillarySinusCases,
+  ...differentiatedThyroidCases,
 ];
 
 function getCasesForPool(pool: CasePool): readonly AnyCase[] {
@@ -159,6 +185,8 @@ function getCasesForPool(pool: CasePool): readonly AnyCase[] {
       return oropharynxHPVPosCases;
     case "oropharynx_hpv_neg":
       return oropharynxHPVNegCases;
+    case "nasopharynx":
+      return nasopharynxCases;
     case "larynx_glottic":
       return larynxGlotticCases;
     case "larynx_supraglottic":
@@ -167,6 +195,10 @@ function getCasesForPool(pool: CasePool): readonly AnyCase[] {
       return larynxSubglotticCases;
     case "hypopharynx":
       return hypopharynxCases;
+    case "maxillary_sinus":
+      return maxillarySinusCases;
+    case "differentiated_thyroid":
+      return differentiatedThyroidCases;
     case "mixed":
     default:
       return mixedCases;
@@ -179,7 +211,7 @@ function isOralCavityCase(c: AnyCase): c is OralCavityCase {
 }
 
 function isOropharynxHPVPosCase(c: AnyCase): c is OropharynxHPVPosCase {
-  return (c as any)?.site_group === "oropharynx";
+  return (c as any)?.site_group === "oropharynx_hpv_pos";
 }
 
 function isOropharynxHPVNegCase(c: AnyCase): c is OropharynxHPVNegCase {
@@ -188,7 +220,11 @@ function isOropharynxHPVNegCase(c: AnyCase): c is OropharynxHPVNegCase {
 
 function isOropharynxCase(c: AnyCase): c is OropharynxHPVPosCase | OropharynxHPVNegCase {
   const g = (c as any)?.site_group;
-  return g === "oropharynx" || g === "oropharynx_hpv_neg";
+  return g === "oropharynx_hpv_pos" || g === "oropharynx_hpv_neg";
+}
+
+function isNasopharynxCase(c: AnyCase): c is NasopharynxCase {
+  return (c as any)?.site_group === "nasopharynx";
 }
 
 function isLarynxGlotticCase(c: AnyCase): c is LarynxGlotticCase {
@@ -213,6 +249,27 @@ function isHypopharynxCase(c: AnyCase): c is HypopharynxCase {
   return (c as any)?.site_group === "hypopharynx";
 }
 
+function isMaxillarySinusCase(c: AnyCase): c is MaxillarySinusCase {
+  return (c as any)?.site_group === "paranasal_sinus" && (c as any)?.subsite === "maxillary_sinus";
+}
+
+function isDifferentiatedThyroidCase(c: AnyCase): c is DifferentiatedThyroidCase {
+  return (c as any)?.site_group === "differentiated_thyroid";
+}
+
+function moduleIdForCase(c: AnyCase): ModuleId {
+  if (isNasopharynxCase(c)) return "nasopharynx";
+  if (isOropharynxHPVPosCase(c)) return "oropharynx_hpv_pos";
+  if (isOropharynxHPVNegCase(c)) return "oropharynx_hpv_neg";
+  if (isLarynxGlotticCase(c)) return "larynx_glottic";
+  if (isLarynxSupraglotticCase(c)) return "larynx_supraglottic";
+  if (isLarynxSubglotticStructuredCase(c) || isLarynxSubglotticInputsCase(c)) return "larynx_subglottic";
+  if (isHypopharynxCase(c)) return "hypopharynx";
+  if (isMaxillarySinusCase(c)) return "maxillary_sinus";
+  if (isDifferentiatedThyroidCase(c)) return "differentiated_thyroid";
+  return "oral_cavity";
+}
+
 // ---- Helpers for display ----
 function prettySubsiteLabel(subsite: OralCavityCase["subsite"]): string {
   switch (subsite) {
@@ -234,10 +291,13 @@ function prettySubsiteLabel(subsite: OralCavityCase["subsite"]): string {
 }
 
 function prettySite(c: AnyCase) {
+  if (isNasopharynxCase(c)) return "nasopharynx";
   if (isLarynxGlotticCase(c)) return "glottic larynx";
   if (isLarynxSupraglotticCase(c)) return "supraglottic larynx";
   if (isLarynxSubglotticStructuredCase(c) || isLarynxSubglotticInputsCase(c)) return "subglottic larynx";
   if (isHypopharynxCase(c)) return "hypopharynx";
+  if (isMaxillarySinusCase(c)) return "maxillary sinus";
+  if (isDifferentiatedThyroidCase(c)) return "differentiated thyroid carcinoma";
 
   if (isOropharynxCase(c)) {
     const lat = (c as any).stem?.laterality;
@@ -302,47 +362,6 @@ function renderValue(v: any): string {
   if (typeof v === "string") return v.length ? v : "—";
   if (typeof v === "object") return "…";
   return String(v);
-}
-
-function GenericFindingsList(props: { tumor?: any; nodes?: any }) {
-  const { tumor, nodes } = props;
-
-  const tumorEntries = tumor && typeof tumor === "object" ? Object.entries(tumor) : [];
-  const nodeEntries = nodes && typeof nodes === "object" ? Object.entries(nodes) : [];
-
-  return (
-    <div style={{ display: "grid", gap: 10 }}>
-      <div>
-        <div style={{ fontSize: 14, color: "#9ca3af", marginBottom: 6 }}>Tumor</div>
-        {tumorEntries.length ? (
-          <ul style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7, fontSize: 18 }}>
-            {tumorEntries.map(([k, v]) => (
-              <li key={k}>
-                {k}: {renderValue(v)}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div style={{ fontSize: 18 }}>—</div>
-        )}
-      </div>
-
-      <div>
-        <div style={{ fontSize: 14, color: "#9ca3af", marginBottom: 6 }}>Nodes</div>
-        {nodeEntries.length ? (
-          <ul style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7, fontSize: 18 }}>
-            {nodeEntries.map(([k, v]) => (
-              <li key={k}>
-                {k}: {renderValue(v)}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div style={{ fontSize: 18 }}>—</div>
-        )}
-      </div>
-    </div>
-  );
 }
 
 function ChoiceGrid<T extends string>(props: {
@@ -449,21 +468,7 @@ function prettyTumorLineNumber(tumor: any, key: string, label?: string, suffix =
   );
 }
 
-function prettyTumorLineArray(tumor: any, key: string, label?: string) {
-  const v = tumor?.[key];
-  const textLabel = label ?? titleCaseFromSnake(key);
-  const out =
-    Array.isArray(v) && v.length ? v.join(", ") : typeof v === "string" && v.length ? v : "no";
-  return (
-    <li key={key}>
-      {textLabel}: {out}
-    </li>
-  );
-}
-
-
-
-export default function QuizPage() {
+export default function StagingDojo() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -483,16 +488,17 @@ export default function QuizPage() {
     return list;
   }, [pool]);
 
-  const safeCases = cases.length > 0 ? cases : mixedCases;
-
-  const [caseIdx, setCaseIdx] = useState(0);
+  const [caseIdx, setCaseIdx] = useState(() => randIndex(oralCavityCases.length));
 
   const clampedIdx = useMemo(() => {
-    if (!safeCases || safeCases.length === 0) return 0;
-    return Math.min(caseIdx, safeCases.length - 1);
-  }, [caseIdx, safeCases.length]);
+    return Math.min(caseIdx, cases.length - 1);
+  }, [caseIdx, cases.length]);
 
-  const c = safeCases[clampedIdx];
+  const c = cases[clampedIdx]!;
+
+  const feedbackUrl = c?.id
+    ? `https://docs.google.com/forms/d/e/1FAIpQLSebfGEEnAVhneAXZsHibWc_64qfJ9Q8tXXQ3YnaXgd4YKjHJA/viewform?usp=pp_url&entry.1860175722=${encodeURIComponent(c.id)}`
+    : "https://docs.google.com/forms/d/e/1FAIpQLSebfGEEnAVhneAXZsHibWc_64qfJ9Q8tXXQ3YnaXgd4YKjHJA/viewform";
 
   type AnyT = string;
   type AnyN = string;
@@ -504,38 +510,15 @@ export default function QuizPage() {
   const [submitted, setSubmitted] = useState(false);
   const [countedThisCase, setCountedThisCase] = useState(false);
 
-  useEffect(() => {
-    const list = getCasesForPool(pool);
-    const safeList = list && list.length > 0 ? list : mixedCases;
-
-    setCaseIdx(safeList.length > 0 ? randIndex(safeList.length) : 0);
-
-    setSubmitted(false);
-    setUserT("");
-    setUserN("");
-    setUserStage("");
-    setCountedThisCase(false);
-  }, [pool]);
-
-  if (!c) {
-    return (
-      <div
-        style={{
-          maxWidth: 980,
-          margin: "0 auto",
-          padding: 16,
-          fontFamily: "system-ui, sans-serif",
-          minHeight: "100vh",
-          backgroundColor: "#020617",
-          color: "#e5e7eb",
-        }}
-      >
-        Loading…
-      </div>
-    );
-  }
-
   const correct = useMemo(() => {
+    // Nasopharynx (AJCC Version 9; M0 assumed)
+    if (isNasopharynxCase(c)) {
+      const T = computeT_Nasopharynx(c.tumor);
+      const N = computeN_Nasopharynx(c.nodes);
+      const stage = computeStageGroup_Nasopharynx(T, N);
+      return { T, N, stage };
+    }
+
     // Larynx glottic
     if (isLarynxGlotticCase(c)) {
       const T = normalizeT(computeT_LarynxGlottic((c as any).tumor));
@@ -576,11 +559,27 @@ export default function QuizPage() {
       return { T, N, stage };
     }
 
+    // Maxillary sinus
+    if (isMaxillarySinusCase(c)) {
+      const T = normalizeT(computeT_MaxillarySinus((c as any).tumor));
+      const N = computeN_MaxillarySinus(getNodesOrDefault(c));
+      const stage = computeStageGroup_MaxillarySinus(T as any, N as any);
+      return { T, N, stage };
+    }
+
+    // Differentiated thyroid carcinoma
+    if (isDifferentiatedThyroidCase(c)) {
+      const T = normalizeT(computeT_DifferentiatedThyroid((c as any).tumor));
+      const N = computeN_DifferentiatedThyroid((c as any).nodes);
+      const stage = computeStageGroup_DifferentiatedThyroid((c as any).age, T as any, N as any);
+      return { T, N, stage };
+    }
+
     // Oropharynx HPV+
     if (isOropharynxHPVPosCase(c)) {
-      const T = normalizeT(computeT_OropharynxHPVPos_Path((c as any).tumor));
-      const N = computeN_OropharynxHPVPos_Path(getNodesOrDefault(c));
-      const stage = computeStageGroup_OropharynxHPVPos_Path(T as any, N as any);
+      const T = normalizeT(computeT_OropharynxHPVPos(c.tumor));
+      const N = computeN_OropharynxHPVPos(c.nodes);
+      const stage = computeStageGroup_OropharynxHPVPos(T as any, N);
       return { T, N, stage };
     }
 
@@ -619,45 +618,135 @@ export default function QuizPage() {
 
   const handlePoolChange = (next: CasePool) => {
     if (next === pool) return;
+    const nextCases = getCasesForPool(next);
     setPool(next);
+    setCaseIdx(randIndex(nextCases.length));
+    setSubmitted(false);
+    setUserT("");
+    setUserN("");
+    setUserStage("");
+    setCountedThisCase(false);
   };
 
   const canSubmit = Boolean(userT && userN && userStage);
-
-  const isOPPos = isOropharynxHPVPosCase(c);
-  const isOPNeg = isOropharynxHPVNegCase(c);
-
-  const isLarynx =
-    isLarynxGlotticCase(c) || isLarynxSupraglotticCase(c) || isLarynxSubglotticStructuredCase(c) || isLarynxSubglotticInputsCase(c);
-  const isHypo = isHypopharynxCase(c);
-
-  const tChoices = (isLarynx
-    ? (["Tis", "T1", "T2", "T3", "T4a", "T4b"] as const)
-    : isHypo
-    ? (["Tis", "T1", "T2", "T3", "T4a", "T4b"] as const)
-    : isOPPos
-    ? (["T0", "T1", "T2", "T3", "T4"] as const)
-    : isOPNeg
-    ? (["T0", "T1", "T2", "T3", "T4a", "T4b"] as const)
-    : (["T1", "T2", "T3", "T4a", "T4b"] as const)) as readonly string[];
-
-  const nChoices = (isOPPos
-    ? (["N0", "N1", "N2"] as const)
-    : (["N0", "N1", "N2a", "N2b", "N2c", "N3a", "N3b"] as const)) as readonly string[];
-
-  const stageChoices = (isLarynx
-    ? (["0", "I", "II", "III", "IVA", "IVB"] as const)
-    : isHypo
-    ? (["0", "I", "II", "III", "IVA", "IVB"] as const)
-    : isOPPos
-    ? (["I", "II", "III"] as const)
-    : (["I", "II", "III", "IVA", "IVB"] as const)) as readonly string[];
+  const activeModuleId = moduleIdForCase(c);
+  const activeMetadata = moduleMetadata[activeModuleId];
+  const tChoices = activeMetadata.tChoices;
+  const nChoices = activeMetadata.nChoices;
+  const stageChoices = activeMetadata.stageChoices;
 
   const tCorrect = submitted && userT === correct.T;
   const nCorrect = submitted && userN === correct.N;
   const stageCorrect = submitted && userStage === correct.stage;
 
   const Findings = () => {
+if (isNasopharynxCase(c)) {
+  const featureLabels: Record<string, string> = {
+    nasal_cavity: "nasal cavity",
+    oropharynx: "oropharynx",
+    parapharyngeal_space: "parapharyngeal space",
+    medial_pterygoid_muscle: "medial pterygoid muscle",
+    lateral_pterygoid_muscle: "lateral pterygoid muscle",
+    prevertebral_muscle: "prevertebral muscle",
+    unequivocal_skull_base_bone: "unequivocal skull-base bone invasion",
+    unequivocal_pterygoid_bone: "unequivocal pterygoid bone invasion",
+    unequivocal_cervical_vertebra: "unequivocal cervical vertebral invasion",
+    paranasal_sinus: "paranasal sinus",
+    intracranial_extension: "intracranial extension",
+    unequivocal_cranial_nerve_involvement: "unequivocal cranial-nerve involvement",
+    hypopharynx: "hypopharynx",
+    orbit_or_inferior_orbital_fissure: "orbit / inferior orbital fissure",
+    parotid_gland: "parotid gland",
+    beyond_anterolateral_lateral_pterygoid: "beyond anterolateral surface of lateral pterygoid",
+  };
+  const features = c.tumor.features.map((feature) => featureLabels[feature]);
+  return (
+    <ul style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7, fontSize: 18 }}>
+      <li>Primary extent: {features.length ? features.join(", ") : "confined to nasopharynx"}</li>
+      <li>Cervical nodes: {c.nodes.cervical_laterality}</li>
+      <li>Retropharyngeal nodes: {c.nodes.retropharyngeal_laterality}</li>
+      <li>Largest node: {c.nodes.largest_node_cm} cm</li>
+      <li>Extends below caudal cricoid border: {c.nodes.extends_below_caudal_cricoid ? "yes" : "no"}</li>
+      <li>Advanced ENE in cervical node: {c.nodes.advanced_ene_cervical ? "yes" : "no"}</li>
+      {c.nodes.advanced_ene_retropharyngeal && <li>Advanced ENE attributed only to retropharyngeal node: yes</li>}
+    </ul>
+  );
+}
+
+if (isDifferentiatedThyroidCase(c)) {
+  const tumor = (c as any).tumor ?? {};
+  const nodes = (c as any).nodes ?? {};
+
+  const eteLabel: Record<string, string> = {
+    none: "none",
+    strap_muscles_only: "strap muscles only",
+    subcutaneous_soft_tissue: "subcutaneous soft tissue",
+    larynx: "larynx",
+    trachea: "trachea",
+    esophagus: "esophagus",
+    recurrent_laryngeal_nerve: "recurrent laryngeal nerve",
+    prevertebral_fascia: "prevertebral fascia",
+    carotid_encasement: "carotid encasement",
+    mediastinal_vessel_encasement: "mediastinal vessel encasement",
+  };
+
+  return (
+    <ul style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7, fontSize: 18 }}>
+      <li>Age: {(c as any).age}</li>
+      <li>Histology: {(c as any).histology}</li>
+      <li>Maximum tumor dimension: {tumor.max_dimension_cm} cm</li>
+      <li>Gross extrathyroidal extension: {eteLabel[tumor.gross_extrathyroidal_extension] ?? renderValue(tumor.gross_extrathyroidal_extension)}</li>
+      <li>Multifocal: {tumor.multifocal ? "yes" : "no"}</li>
+      <li>Regional nodes involved: {nodes.involved ? "yes" : "no"}</li>
+      {nodes.involved && <li>Nodal compartments: {Array.isArray(nodes.compartments) && nodes.compartments.length ? nodes.compartments.join(", ") : "—"}</li>}
+      {nodes.involved && <li>Nodal laterality: {renderValue(nodes.laterality)}</li>}
+    </ul>
+  );
+}
+
+if (isMaxillarySinusCase(c)) {
+  const tumor = (c as any).tumor ?? {};
+  const nodes = getNodesOrDefault(c);
+
+  const involvedStructures = [
+    ["Bone erosion/destruction", tumor.bone_erosion_or_destruction],
+    ["Hard palate", tumor.hard_palate],
+    ["Middle nasal meatus", tumor.middle_nasal_meatus],
+    ["Posterior maxillary sinus wall", tumor.posterior_wall_maxillary_sinus],
+    ["Subcutaneous tissues", tumor.subcutaneous_tissues],
+    ["Orbital floor / medial wall", tumor.orbital_floor_or_medial_wall],
+    ["Pterygoid fossa", tumor.pterygoid_fossa],
+    ["Ethmoid sinus", tumor.ethmoid_sinus],
+    ["Anterior orbital contents", tumor.anterior_orbital_contents],
+    ["Cheek skin", tumor.cheek_skin],
+    ["Pterygoid plates", tumor.pterygoid_plates],
+    ["Infratemporal fossa", tumor.infratemporal_fossa],
+    ["Cribriform plate", tumor.cribriform_plate],
+    ["Sphenoid sinus", tumor.sphenoid_sinus],
+    ["Frontal sinus", tumor.frontal_sinus],
+    ["Orbital apex", tumor.orbital_apex],
+    ["Dura", tumor.dura],
+    ["Brain", tumor.brain],
+    ["Middle cranial fossa", tumor.middle_cranial_fossa],
+    ["Cranial nerve other than V2", tumor.cranial_nerve_other_than_v2],
+    ["Nasopharynx", tumor.nasopharynx],
+    ["Clivus", tumor.clivus],
+  ].filter(([, present]) => Boolean(present));
+
+  return (
+    <ul style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7, fontSize: 18 }}>
+      <li>Primary site: maxillary sinus</li>
+      <li>Involved structures: {involvedStructures.length ? involvedStructures.map(([label]) => label).join(", ") : "maxillary sinus mucosa only"}</li>
+      <li>
+        Nodes: positive nodes {nodes.positive_node_count}
+        {nodes.laterality ? `, laterality ${nodes.laterality}` : ""}
+        {typeof nodes.largest_node_cm === "number" ? `, largest ${nodes.largest_node_cm} cm` : ""}
+        {typeof nodes.ene === "boolean" ? `, clinically overt ENE ${nodes.ene ? "yes" : "no"}` : ""}
+      </li>
+    </ul>
+  );
+}
+
 if (isLarynxSubglotticInputsCase(c) || isLarynxSubglotticStructuredCase(c)) {
   const tumor = isLarynxSubglotticInputsCase(c) ? (c as any).inputs ?? {} : (c as any).tumor ?? {};
   const nodes = getNodesOrDefault(c);
@@ -682,7 +771,7 @@ if (isLarynxSubglotticInputsCase(c) || isLarynxSubglotticStructuredCase(c)) {
         Nodes: positive nodes {nodes.positive_node_count}
         {nodes.laterality ? `, laterality ${nodes.laterality}` : ""}
         {typeof nodes.largest_node_cm === "number" ? `, largest ${nodes.largest_node_cm} cm` : ""}
-        {typeof nodes.ene === "boolean" ? `, ENE ${nodes.ene ? "yes" : "no"}` : ""}
+        {typeof nodes.ene === "boolean" ? `, clinically overt ENE ${nodes.ene ? "yes" : "no"}` : ""}
       </li>
     </ul>
   );
@@ -714,7 +803,7 @@ if (isHypopharynxCase(c)) {
         Nodes: positive nodes {nodes.positive_node_count}
         {nodes.laterality ? `, laterality ${nodes.laterality}` : ""}
         {typeof nodes.largest_node_cm === "number" ? `, largest ${nodes.largest_node_cm} cm` : ""}
-        {typeof nodes.ene === "boolean" ? `, ENE ${nodes.ene ? "yes" : "no"}` : ""}
+        {typeof nodes.ene === "boolean" ? `, clinically overt ENE ${nodes.ene ? "yes" : "no"}` : ""}
       </li>
     </ul>
   );
@@ -743,7 +832,7 @@ if (isHypopharynxCase(c)) {
             Nodes: positive nodes {nodes.positive_node_count}
             {nodes.laterality ? `, laterality ${nodes.laterality}` : ""}
             {typeof nodes.largest_node_cm === "number" ? `, largest ${nodes.largest_node_cm} cm` : ""}
-            {typeof nodes.ene === "boolean" ? `, ENE ${nodes.ene ? "yes" : "no"}` : ""}
+            {typeof nodes.ene === "boolean" ? `, clinically overt ENE ${nodes.ene ? "yes" : "no"}` : ""}
           </li>
         </ul>
       );
@@ -785,13 +874,27 @@ if (isHypopharynxCase(c)) {
             Nodes: positive nodes {nodes.positive_node_count}
             {nodes.laterality ? `, laterality ${nodes.laterality}` : ""}
             {typeof nodes.largest_node_cm === "number" ? `, largest ${nodes.largest_node_cm} cm` : ""}
-            {typeof nodes.ene === "boolean" ? `, ENE ${nodes.ene ? "yes" : "no"}` : ""}
+            {typeof nodes.ene === "boolean" ? `, clinically overt ENE ${nodes.ene ? "yes" : "no"}` : ""}
           </li>
         </ul>
       );
     }
 
-    if (isOropharynxCase(c)) {
+    if (isOropharynxHPVPosCase(c)) {
+      const t4 = c.tumor.t4_structures?.join(", ") ?? "none";
+      return (
+        <ul style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7, fontSize: 18 }}>
+          <li>Tumor size: {c.tumor.size_cm} cm</li>
+          <li>Lingual epiglottic extension: {c.tumor.extends_to_lingual_epiglottis ? "yes" : "no"}</li>
+          <li>T4 structure invasion: {t4}</li>
+          <li>Nodes: {c.nodes.positive_node_count} radiographically involved, {c.nodes.laterality}, largest {c.nodes.largest_node_cm} cm</li>
+          <li>Unequivocal imaging ENE: {c.nodes.unequivocal_imaging_ene ? "yes" : "no"}</li>
+          <li>HPV status: associated</li>
+        </ul>
+      );
+    }
+
+    if (isOropharynxHPVNegCase(c)) {
       const hpvLabel = isOropharynxHPVNegCase(c) ? "negative" : "positive";
       const tumor = (c as any).tumor ?? {};
       const nodes = getNodesOrDefault(c);
@@ -808,7 +911,7 @@ if (isHypopharynxCase(c)) {
             Nodes: positive nodes {nodes.positive_node_count}
             {nodes.laterality ? `, laterality ${nodes.laterality}` : ""}
             {typeof nodes.largest_node_cm === "number" ? `, largest ${nodes.largest_node_cm} cm` : ""}
-            {typeof nodes.ene === "boolean" ? `, ENE ${nodes.ene ? "yes" : "no"}` : ""}
+            {typeof nodes.ene === "boolean" ? `, clinically overt ENE ${nodes.ene ? "yes" : "no"}` : ""}
           </li>
           <li>HPV status: {hpvLabel}</li>
         </ul>
@@ -821,11 +924,13 @@ if (isHypopharynxCase(c)) {
         <ul style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7, fontSize: 18 }}>
           <li>Tumor size: {oc.tumor.size_cm} cm</li>
           <li>Depth of invasion: {oc.tumor.doi_mm} mm</li>
-          <li>Bone invasion: {oc.tumor.bone_invasion ? "yes" : "no"}</li>
+          <li>Through-cortical bone invasion: {oc.tumor.bone_invasion ? "yes" : "no"}</li>
           <li>Extrinsic muscle involved: {oc.tumor.extrinsic_muscle_involved ? "yes" : "no"}</li>
           <li>Skin invasion: {oc.tumor.skin_invasion ? "yes" : "no"}</li>
+          <li>Maxillary sinus invasion: {oc.tumor.maxillary_sinus_invasion ? "yes" : "no"}</li>
+          <li>Masticator space / pterygoid plate / skull base / carotid involvement: {oc.tumor.masticator_space_invasion || oc.tumor.pterygoid_plate_invasion || oc.tumor.skull_base_invasion || oc.tumor.internal_carotid_encasement ? "yes" : "no"}</li>
           <li>
-            Nodes: count {oc.nodes.node_count}, laterality {oc.nodes.laterality}, largest {oc.nodes.largest_node_cm} cm, ENE{" "}
+            Nodes: count {oc.nodes.node_count}, laterality {oc.nodes.laterality}, largest {oc.nodes.largest_node_cm} cm, clinically overt ENE{" "}
             {oc.nodes.ene ? "yes" : "no"}
           </li>
         </ul>
@@ -866,22 +971,25 @@ if (isHypopharynxCase(c)) {
         />
 
         <h1 style={{ margin: 0, fontSize: 24 }}>🦀🦀 CrabsMcChaffey Staging Dojo 🦀🦀</h1>
-        <p style={{ margin: 0, fontSize: 14, color: "#9ca3af" }}>Interactive TNM drills for HN Cancer Staging</p>
+        <p style={{ margin: 0, fontSize: 14, color: "#9ca3af" }}>Interactive clinical TNM drills for head and neck cancer</p>
       </div>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
         {(
           [
-            ["oral_cavity", "Oral cavity"],
-            ["oropharynx_hpv_pos", "Oropharynx (HPV+)"],
-            ["oropharynx_hpv_neg", "Oropharynx (HPV−)"],
-            ["larynx_glottic", "Larynx (glottic)"],
-            ["larynx_supraglottic", "Larynx (supraglottic)"],
-            ["larynx_subglottic", "Larynx (subglottic)"],
-            ["hypopharynx", "Hypopharynx"],
-            ["mixed", "Mixed"],
-          ] as [CasePool, string][]
-        ).map(([value, label]) => (
+            "oral_cavity",
+            "oropharynx_hpv_pos",
+            "oropharynx_hpv_neg",
+            "nasopharynx",
+            "larynx_glottic",
+            "larynx_supraglottic",
+            "larynx_subglottic",
+            "hypopharynx",
+            "maxillary_sinus",
+            "differentiated_thyroid",
+            "mixed",
+          ] as readonly CasePool[]
+        ).map((value) => (
           <button
             key={value}
             type="button"
@@ -897,9 +1005,13 @@ if (isHypopharynxCase(c)) {
               whiteSpace: "nowrap",
             }}
           >
-            {label}
+            {value === "mixed" ? "Mixed" : moduleMetadata[value].label}
           </button>
         ))}
+      </div>
+
+      <div style={{ color: "#93c5fd", marginBottom: 12, fontSize: 14, fontWeight: 600 }}>
+        {stagingSystemLabel(activeModuleId)} · M0 assumed; M category is not tested
       </div>
 
       <div style={{ color: "#e5e7eb", marginBottom: 16, fontSize: 18 }}>{renderStemOrPrompt(c)}</div>
@@ -1009,6 +1121,18 @@ if (isHypopharynxCase(c)) {
 
           <div style={{ marginTop: 12, color: "#e5e7eb", fontSize: 18 }}>
             Teaching pearl: {(c as any).teaching_pearl ?? "—"}
+          </div>
+
+          <div style={{ marginTop: 14, fontSize: 14, color: "#9ca3af" }}>
+            Think something is incorrect?{" "}
+            <a
+              href={feedbackUrl}
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: "#e5e7eb", textDecoration: "underline" }}
+            >
+              Report an issue
+            </a>
           </div>
         </div>
       )}

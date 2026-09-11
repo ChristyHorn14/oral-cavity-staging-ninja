@@ -1,5 +1,5 @@
 // lib/staging/hypopharynxStage.ts
-// Hypopharynx T staging (AJCC 8–style rules; MVP feature-driven)
+// Hypopharynx clinical T staging (AJCC 8; feature-driven)
 // Returns UI-friendly strings: "TX" | "T0" | "Tis" | "T1" | "T2" | "T3" | "T4a" | "T4b"
 //
 // Key rule decisions (documented):
@@ -44,7 +44,7 @@ export interface HypopharynxTInputs {
   multiple_hypopharynx_subsites: boolean; // true if >1 hypopharynx subsite involved
 
   // adjacent site involvement (without deep invasion) usually pushes to T2;
-  // explicit esophagus extension upgrades to T3 (see below).
+  // definite esophagus extension upgrades to T3 (see below).
   adjacent_site_involvement?: HypopharynxAdjacentSite;
 
   // laryngeal function
@@ -95,7 +95,7 @@ export function computeT_Hypopharynx(i: HypopharynxTInputs): HypopharynxT {
 
   // T3
   if (mobility === "fixed") return "T3";
-  if (Boolean(i.extends_to_esophagus)) return "T3"; // explicit AJCC-style rule
+  if (Boolean(i.extends_to_esophagus) || adjacent === "cervical_esophagus") return "T3";
   if (i.max_dimension_cm > 4) return "T3";
 
   // T2
@@ -107,8 +107,6 @@ export function computeT_Hypopharynx(i: HypopharynxTInputs): HypopharynxT {
   if (i.multiple_hypopharynx_subsites) return "T2";
 
   if (adjacent !== "none" && adjacent !== "unknown") {
-    // Note: if adjacent is cervical_esophagus but extends_to_esophagus wasn't explicitly set,
-    // we still treat it as T2 to avoid silently upgrading to T3. Set extends_to_esophagus=true for T3.
     return "T2";
   }
 

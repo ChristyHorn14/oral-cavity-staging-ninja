@@ -100,8 +100,9 @@ export const retromolarTrigoneCases: OralCavityCase[] = [
       size_cm: 3.9,
       doi_mm: 9,
       bone_invasion: false,
-      extrinsic_muscle_involved: true,
+      extrinsic_muscle_involved: false,
       skin_invasion: false,
+      masticator_space_invasion: true,
     },
     nodes: {
       node_count: 1,
@@ -110,7 +111,7 @@ export const retromolarTrigoneCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Extrinsic muscle invasion (e.g., pterygoids) is another T4a trigger for retromolar trigone tumors.",
+      "Masticator-space invasion is T4b. Generic extrinsic tongue-muscle involvement is not an independent oral-cavity T4 criterion.",
   },
   {
     id: "rt-006",
@@ -162,7 +163,7 @@ export const retromolarTrigoneCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Single ipsilateral node between 3–6 cm without ENE is N2a in AJCC8.",
+      "Single ipsilateral node between 3–6 cm without clinically overt ENE is N2a in AJCC8.",
   },
   {
     id: "rt-008",
@@ -188,7 +189,7 @@ export const retromolarTrigoneCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Multiple ipsilateral nodes ≤6 cm without ENE are staged N2b.",
+      "Multiple ipsilateral nodes ≤6 cm without clinically overt ENE are staged N2b.",
   },
   {
     id: "rt-009",
@@ -214,7 +215,7 @@ export const retromolarTrigoneCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Bilateral nodes ≤6 cm without ENE correspond to N2c in oral cavity staging.",
+      "Bilateral nodes ≤6 cm without clinically overt ENE correspond to N2c in oral cavity staging.",
   },
   {
     id: "rt-010",
@@ -240,7 +241,7 @@ export const retromolarTrigoneCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Any contralateral nodal disease ≤6 cm without ENE is N2c, regardless of primary size.",
+      "Any contralateral nodal disease ≤6 cm without clinically overt ENE is N2c, regardless of primary size.",
   },
   {
     id: "rt-011",
@@ -266,7 +267,7 @@ export const retromolarTrigoneCases: OralCavityCase[] = [
       ene: false,
     },
     teaching_pearl:
-      "Nodes >6 cm without ENE are N3a and usually indicate very advanced stage.",
+      "Size >4 cm together with DOI >10 mm makes the primary T4a; the >6 cm clinically ENE-negative node is N3a, producing stage IVB.",
   },
   {
     id: "rt-012",
@@ -275,7 +276,7 @@ export const retromolarTrigoneCases: OralCavityCase[] = [
       age: 65,
       sex: "F",
       risk: "none",
-      symptom: "retromolar ulcer with ENE-positive node",
+      symptom: "retromolar ulcer with clinically overt ENE-positive node",
       laterality: "left",
     },
     tumor: {
@@ -292,7 +293,7 @@ export const retromolarTrigoneCases: OralCavityCase[] = [
       ene: true,
     },
     teaching_pearl:
-      "Any ENE-positive nodal disease is N3b in the simplified nodal scheme we’re using.",
+      "A single ipsilateral node ≤3 cm with clinically overt ENE is cN2a, not cN3b; cN3b requires a larger ipsilateral node or multiple/contralateral/bilateral clinically overt ENE-positive nodes.",
   },
   {
     id: "rt-013",

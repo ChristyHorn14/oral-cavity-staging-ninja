@@ -1,6 +1,6 @@
 // lib/staging/types.ts
 
-export type TCategory = "T1" | "T2" | "T3" | "T4a";
+export type TCategory = "T1" | "T2" | "T3" | "T4a" | "T4b";
 
 export type NCategory =
   | "N0"
@@ -31,15 +31,23 @@ export type OralCavitySubsite =
 export interface TumorFeatures {
   size_cm: number;
   doi_mm: number;
+  /** Through-cortical invasion; superficial socket erosion alone does not qualify. */
   bone_invasion: boolean;
+  /** Recorded for clinical realism; no longer independently upstages oral cavity T in AJCC 8. */
   extrinsic_muscle_involved: boolean;
   skin_invasion: boolean;
+  maxillary_sinus_invasion?: boolean;
+  masticator_space_invasion?: boolean;
+  pterygoid_plate_invasion?: boolean;
+  skull_base_invasion?: boolean;
+  internal_carotid_encasement?: boolean;
 }
 
 export interface NodeFeatures {
   node_count: number;
   laterality: NodeLaterality;
   largest_node_cm: number;
+  /** Clinically overt ENE only; microscopic/pathologic ENE is outside this app's scope. */
   ene: boolean;
 }
 

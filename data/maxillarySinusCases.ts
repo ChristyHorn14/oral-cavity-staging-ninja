@@ -444,7 +444,7 @@ export const maxillarySinusCases: readonly MaxillarySinusCase[] = [
     },
     expectedT: "T2",
     teaching_pearl:
-      "The primary is only T2, but extranodal extension makes the nodal category N3b and therefore drives the overall stage to IVB in the app's current M0 model.",
+      "The primary is T2. One ipsilateral node ≤3 cm with clinically overt ENE is cN2a, so the overall M0 stage is IVA—not IVB.",
     nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.2, ene: true },
   },
   {

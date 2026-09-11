@@ -68,7 +68,7 @@ export const oropharynxHPVNegCases = [
     stem: { age: 57, sex: "male", risk: "both", laterality: "right", symptom: "neck mass" },
     tumor: { size_cm: 1.8 },
     nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.8, ene: false },
-    teaching_pearl: "A single ipsilateral node ≤3 cm (ENE−) is N1 → stage III if T1–T3.",
+    teaching_pearl: "A single ipsilateral node ≤3 cm (clinically overt ENE−) is N1 → stage III if T1–T3.",
   },
 
   // 7) T2 N1 → III
@@ -78,7 +78,7 @@ export const oropharynxHPVNegCases = [
     stem: { age: 60, sex: "male", risk: "tobacco", laterality: "left", symptom: "otalgia" },
     tumor: { size_cm: 2.7 },
     nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.9, ene: false },
-    teaching_pearl: "T2 N1 (ENE−, ≤3 cm) is stage III in HPV-negative OP.",
+    teaching_pearl: "T2 N1 (clinically overt ENE−, ≤3 cm) is stage III in HPV-negative OP.",
   },
 
   // 8) T3 N1 → III
@@ -101,7 +101,7 @@ export const oropharynxHPVNegCases = [
     stem: { age: 63, sex: "male", risk: "tobacco", laterality: "left", symptom: "neck mass" },
     tumor: { size_cm: 1.9 },
     nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 4.2, ene: false },
-    teaching_pearl: "Single ipsilateral node >3–6 cm (ENE−) is N2a → stage IVA if T1–T3.",
+    teaching_pearl: "Single ipsilateral node >3–6 cm (clinically overt ENE−) is N2a → stage IVA if T1–T3.",
   },
 
   // 10) T2 N2a → IVA
@@ -131,7 +131,7 @@ export const oropharynxHPVNegCases = [
     stem: { age: 58, sex: "male", risk: "tobacco", laterality: "right", symptom: "neck swelling" },
     tumor: { size_cm: 1.2 },
     nodes: { positive_node_count: 3, laterality: "ipsilateral", largest_node_cm: 2.6, ene: false },
-    teaching_pearl: "Multiple ipsilateral nodes (all ≤6 cm, ENE−) is N2b → stage IVA.",
+    teaching_pearl: "Multiple ipsilateral nodes (all ≤6 cm, clinically overt ENE−) is N2b → stage IVA.",
   },
 
   // 13) T2 N2b → IVA
@@ -161,7 +161,7 @@ export const oropharynxHPVNegCases = [
     stem: { age: 56, sex: "female", risk: "etoh", laterality: "left", symptom: "neck mass" },
     tumor: { size_cm: 1.7 },
     nodes: { positive_node_count: 2, laterality: "contralateral", largest_node_cm: 2.7, ene: false },
-    teaching_pearl: "Contralateral or bilateral nodes (≤6 cm, ENE−) are N2c → stage IVA.",
+    teaching_pearl: "Contralateral or bilateral nodes (≤6 cm, clinically overt ENE−) are N2c → stage IVA.",
   },
 
   // 16) T2 N2c (bilateral) → IVA
@@ -171,7 +171,7 @@ export const oropharynxHPVNegCases = [
     stem: { age: 65, sex: "male", risk: "both", laterality: "midline", symptom: "neck swelling" },
     tumor: { size_cm: 3.9 },
     nodes: { positive_node_count: 3, laterality: "bilateral", largest_node_cm: 3.4, ene: false },
-    teaching_pearl: "Bilateral nodes ≤6 cm (ENE−) are N2c → stage IVA.",
+    teaching_pearl: "Bilateral nodes ≤6 cm (clinically overt ENE−) are N2c → stage IVA.",
   },
 
   // 17) T3 N2c → IVA
@@ -220,14 +220,14 @@ export const oropharynxHPVNegCases = [
   // -----------------------------
   // N3 disease → IVB
   // -----------------------------
-  // 21) N3a (>6 cm, ENE−) with small primary
+  // 21) N3a (>6 cm, clinically overt ENE−) with small primary
   {
     site_group: "oropharynx_hpv_neg",
     subsite: "tonsil",
     stem: { age: 58, sex: "male", risk: "both", laterality: "left", symptom: "large neck mass" },
     tumor: { size_cm: 1.3 },
     nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 6.4, ene: false },
-    teaching_pearl: "Node >6 cm (ENE−) is N3a → stage IVB regardless of T.",
+    teaching_pearl: "Node >6 cm (clinically overt ENE−) is N3a → stage IVB regardless of T.",
   },
 
   // 22) N3a with multiple nodes (still N3a by size)
@@ -237,17 +237,17 @@ export const oropharynxHPVNegCases = [
     stem: { age: 67, sex: "female", risk: "tobacco", laterality: "right", symptom: "neck mass" },
     tumor: { size_cm: 2.1 },
     nodes: { positive_node_count: 3, laterality: "ipsilateral", largest_node_cm: 7.1, ene: false },
-    teaching_pearl: "Largest node >6 cm (ENE−) is N3a even with multiple nodes.",
+    teaching_pearl: "Largest node >6 cm (clinically overt ENE−) is N3a even with multiple nodes.",
   },
 
-  // 23) N3b (ENE+) with small nodes
+  // 23) cN2a: single small ipsilateral node with clinically overt ENE
   {
     site_group: "oropharynx_hpv_neg",
     subsite: "soft_palate",
     stem: { age: 53, sex: "male", risk: "etoh", laterality: "left", symptom: "neck swelling" },
     tumor: { size_cm: 2.5 },
     nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.0, ene: true },
-    teaching_pearl: "Any ENE+ nodal disease is N3b → stage IVB.",
+    teaching_pearl: "A single ipsilateral node ≤3 cm with clinically overt ENE is cN2a, so T2N2aM0 is stage IVA.",
   },
 
   // 24) N3b with bilateral nodes
@@ -257,7 +257,7 @@ export const oropharynxHPVNegCases = [
     stem: { age: 62, sex: "male", risk: "both", laterality: "midline", symptom: "neck mass" },
     tumor: { size_cm: 3.8 },
     nodes: { positive_node_count: 2, laterality: "bilateral", largest_node_cm: 3.1, ene: true },
-    teaching_pearl: "ENE+ overrides laterality/size categories: N3b.",
+    teaching_pearl: "clinically overt ENE+ overrides laterality/size categories: N3b.",
   },
 
   // -----------------------------
@@ -293,14 +293,14 @@ export const oropharynxHPVNegCases = [
     teaching_pearl: "T4b overrides N2 categories; stage is IVB.",
   },
 
-  // 28) T4b with ENE+ (still IVB)
+  // 28) T4b with clinically overt ENE+ (still IVB)
   {
     site_group: "oropharynx_hpv_neg",
     subsite: "soft_palate",
     stem: { age: 63, sex: "male", risk: "etoh", laterality: "right", symptom: "neck swelling" },
     tumor: { size_cm: 4.0, advanced_local_extension: true, very_advanced_local_extension: true },
     nodes: { positive_node_count: 1, laterality: "ipsilateral", largest_node_cm: 2.4, ene: true },
-    teaching_pearl: "T4b and/or N3 makes stage IVB; ENE+ specifically is N3b.",
+    teaching_pearl: "T4b makes the stage IVB. The single 2.4 cm ipsilateral node with clinically overt ENE is cN2a, not cN3b.",
   },
 
   // -----------------------------
@@ -313,7 +313,7 @@ export const oropharynxHPVNegCases = [
     stem: { age: 50, sex: "male", risk: "both", laterality: "right", symptom: "neck mass" },
     tumor: { size_cm: 3.4 },
     nodes: { positive_node_count: 2, laterality: "ipsilateral", largest_node_cm: 2.7, ene: false },
-    teaching_pearl: "Common pattern: T2 with multiple ipsilateral nodes (ENE−) is IVA.",
+    teaching_pearl: "Common pattern: T2 with multiple ipsilateral nodes (clinically overt ENE−) is IVA.",
   },
 
   // 30) T1 N2c (IVA) – contralateral spread edge
@@ -323,6 +323,6 @@ export const oropharynxHPVNegCases = [
     stem: { age: 57, sex: "female", risk: "tobacco", laterality: "left", symptom: "neck swelling" },
     tumor: { size_cm: 1.9 },
     nodes: { positive_node_count: 2, laterality: "contralateral", largest_node_cm: 2.9, ene: false },
-    teaching_pearl: "Contralateral nodal disease (≤6 cm, ENE−) is N2c → stage IVA.",
+    teaching_pearl: "Contralateral nodal disease (≤6 cm, clinically overt ENE−) is N2c → stage IVA.",
   },
 ] as const;
